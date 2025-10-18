@@ -183,33 +183,12 @@ resources:
 
 ## 데이터 구조
 
-```typescript
-interface Tile {
-  x: number;
-  y: number;
-  type: "grass" | "road" | "forest" | "swamp" | "mountain" | "water" | "lava";
-  tags: string[];  // ["초원_풀숲", "밤"]
-  isWalkable: boolean;
-  speedModifier: number;
+> 월드 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-  fogState: "unexplored" | "explored" | "owned";
-  ownedByPlayer: boolean;
-}
-
-interface WorldMap {
-  width: number;
-  height: number;
-  tiles: Tile[][];
-  playerPosition: { x: number; y: number };
-}
-
-interface Camp {
-  position: { x: number; y: number };
-  startTime: number;
-  healingRate: number;
-  isActive: boolean;
-}
-```
+주요 개념:
+- **Tile**: 타일 정보 (좌표, 타입, 태그, 이동 가능 여부, 안개 상태)
+- **WorldMap**: 전체 맵 (크기, 타일 배열, 지역/마을/요새 위치)
+- **Camp**: 야영 상태 (위치, 시작 시간, 회복률)
 
 ## UI 요구사항
 

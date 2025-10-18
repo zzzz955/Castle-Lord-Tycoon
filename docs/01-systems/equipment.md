@@ -135,14 +135,13 @@ utility:
 
 ### 등급별 옵션 수
 
-```typescript
-interface EquipmentOptions {
-  C: 0;   // 0-1개
-  UC: 1;  // 0-1개
-  R: 2;   // 1-2개
-  H: 2;   // 2개 확정
-  L: 2;   // 2개 확정, 높은 수치
-}
+```yaml
+options_by_grade:
+  C: 0-1개
+  UC: 0-1개
+  R: 1-2개
+  H: 2개 확정
+  L: 2개 확정, 높은 수치
 ```
 
 ## 레벨 밴드
@@ -219,37 +218,13 @@ monster_drop_table:
 
 ## 데이터 구조
 
-```typescript
-interface Equipment {
-  id: string;
-  templateId: string;
+> 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-  // 기본 정보
-  name: string;
-  grade: "C" | "UC" | "R" | "H" | "L";
-  type: "weapon" | "armor" | "ring" | "neckless" | "belt";
-  requiredLevel: number;
-
-  // 스탯
-  baseStat: {
-    type: "attack" | "defense" | "hp" | "critical_rate" | "block_rate";
-    value: number;
-  };
-
-  // 옵션
-  options: EquipmentOption[];
-
-  // 메타
-  equipped: boolean;
-  equippedBy?: string;  // hero ID
-}
-
-interface EquipmentOption {
-  type: "offensive" | "defensive" | "utility";
-  stat: string;  // "추가 공격", "드랍률" 등
-  value: number;
-}
-```
+주요 개념:
+- **Equipment**: 장비 정보 (등급, 타입, 착용 레벨, 기본 스탯, 옵션)
+- **EquipmentOption**: 추가 옵션 (공격/방어/유틸리티 타입, 스탯, 수치)
+- **등급 시스템**: C/UC/R/H/L 색상 기반 등급
+- **부위별 장비**: 무기, 방어구, 목걸이, 반지, 벨트
 
 ## UI 요구사항
 

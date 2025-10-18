@@ -61,23 +61,17 @@ ranks:
 
 ### 조건 판정
 
-```typescript
-interface RankRequirement {
-  area: number;          // 영토 타일 수
-  towns?: number;        // 점령 마을 수
-  fortresses?: number;   // 해금 요새 수
-}
+```yaml
+requirement_check:
+  fields:
+    - area: "영토 타일 수"
+    - towns: "점령 마을 수"
+    - fortresses: "해금 요새 수"
 
-function checkRankUp(player: Player): Rank | null {
-  for (const rank of RANKS_DESC) {  // 높은 순서부터
-    if (player.territory.area >= rank.requirement.area &&
-        player.towns.owned.length >= (rank.requirement.towns || 0) &&
-        player.fortresses.unlocked.length >= (rank.requirement.fortresses || 0)) {
-      return rank;
-    }
-  }
-  return null;
-}
+  logic:
+    - 높은 계급부터 순차 확인
+    - 모든 조건 충족 시 승급
+    - 즉시 적용
 ```
 
 ### 승급 시점
@@ -184,55 +178,31 @@ emperor:
 
 ## 데이터 구조
 
-```typescript
-interface Rank {
-  id: string;
-  name: string;
-  order: number;  // 순서 (낮을수록 높은 계급)
+> 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-  requirement: RankRequirement;
-
-  benefits: {
-    expBonus?: number;       // %
-    dropRateBonus?: number;  // %
-    campingEfficiency?: number;
-    movementSpeed?: number;
-    upgradeCostReduction?: number;
-  };
-}
-
-interface PlayerProgression {
-  currentRank: Rank;
-  territory: {
-    area: number;
-    towns: number;
-    fortresses: number;
-  };
-
-  checkPromotion(): Rank | null;
-  promote(newRank: Rank): void;
-  getActiveBenefits(): Benefits;
-}
-```
+주요 개념:
+- **Rank**: 계급 정보 (이름, 승급 조건, 혜택)
+- **RankRequirement**: 승급 조건 (영토 면적, 마을 수, 요새 수)
+- **Benefits**: 계급 혜택 (경험치, 드랍률, 효율 보너스)
+- **PlayerProgression**: 플레이어 진행 상황 (현재 계급, 영토 통계)
 
 ## 혜택 적용
 
 ### 경험치 보너스
 
-```typescript
-function calculateExp(baseExp: number, rank: Rank): number {
-  const bonus = rank.benefits.expBonus || 0;
-  return Math.floor(baseExp * (1 + bonus / 100));
-}
+```yaml
+calculation:
+  formula: "기본 경험치 × (1 + 보너스%)"
+  example: "100 exp × 1.5 (50% 보너스) = 150 exp"
 ```
 
 ### 드랍률 보너스
 
-```typescript
-function calculateDropRate(baseRate: number, rank: Rank): number {
-  const bonus = rank.benefits.dropRateBonus || 0;
-  return Math.min(baseRate + bonus, 100);  // 100% 상한
-}
+```yaml
+calculation:
+  formula: "기본 확률 + 보너스%"
+  cap: "100% 상한"
+  example: "10% + 40% 보너스 = 50%"
 ```
 
 ## UI 요구사항

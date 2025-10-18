@@ -141,53 +141,13 @@ fortress_placement:
 
 ## 데이터 구조
 
-```typescript
-interface Town {
-  id: string;
-  name: string;
-  position: { x: number; y: number };
-  size: number;  // 기본 영토 크기
+> 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-  owned: boolean;
-  conqueredAt?: number;  // timestamp
-
-  region: string;
-  difficulty: number;
-
-  features: {
-    recovery: boolean;
-    shop?: Shop;
-    storage?: boolean;
-  };
-}
-
-interface Fortress {
-  id: string;
-  name: string;
-  position: { x: number; y: number };
-  size: number; // 기본 영토 크기
-
-  unlocked: boolean;
-  unlockedAt?: number;
-
-  firstBattle: Battle;  // 해금 전투
-  rewards: Item[];      // 확정 드랍
-
-  features: {
-    shop: Shop;
-    exchange: Exchange;
-    crafting: CraftingStation;
-  };
-}
-
-interface Settlement {
-  towns: Map<string, Town>;
-  fortresses: Map<string, Fortress>;
-
-  checkAutoConquest(): Town[];
-  unlockFortress(fortressId: string): boolean;
-}
-```
+주요 개념:
+- **Town**: 마을 정보 (위치, 소유 여부, 기능, 지역/난이도)
+- **Fortress**: 요새 정보 (위치, 해금 상태, 전투, 보상, 시설)
+- **자동 점령**: 영토 연결 완성 시 즉시 마을 점령
+- **요새 해금**: 최초 접근 시 전투 발생, 승리 시 시설 이용 가능
 
 ## UI 요구사항
 

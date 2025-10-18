@@ -4,354 +4,528 @@
 
 ### Hero (영웅)
 
-```typescript
-interface Hero {
-  // 식별
-  id: string;              // 고유 ID
-  templateId: string;      // 영웅 종류
-  type: string; // 영웅 타입(공격, 방어, 지원)
+```csharp
+using System;
+using System.Collections.Generic;
 
-  // 등급
-  starGrade: 1 | 2 | 3 | 4 | 5 | 6;
+public class Hero
+{
+    // 식별
+    public string Id { get; set; }              // 고유 ID
+    public string TemplateId { get; set; }      // 영웅 종류
+    public string Type { get; set; }            // 영웅 타입(공격, 방어, 지원)
 
-  // 기본 정보
-  name: string;
-  element: Element;
+    // 등급
+    public int StarGrade { get; set; }          // 1 | 2 | 3 | 4 | 5 | 6
 
-  // 레벨 & 경험치
-  level: number;
-  currentExp: number;
+    // 기본 정보
+    public string Name { get; set; }
+    public Element Element { get; set; }
 
-  // 스탯
-  stats: {
-    hp: number;
-    maxHp: number;
-    attack: number;
-    defense: number;
-    critical_rate: number;
-    critical_damage: number;
-    block_rate: number;
-  };
+    // 레벨 & 경험치
+    public int Level { get; set; }
+    public int CurrentExp { get; set; }
 
-  // 성장
-  baseStats: Stats;        // 레벨 1 기준
-  growthRates: Stats;      // 레벨당 증가량
-  rebirths: number; // 환생 횟수, 환생 시 growthRates증가, 기존 레벨당 증가량 격차만큼 능력치 보정
+    // 스탯
+    public HeroStats Stats { get; set; }
 
-  // 효과 (★4+)
-  uniqueEffects?: Effect[];
+    // 성장
+    public Stats BaseStats { get; set; }        // 레벨 1 기준
+    public Stats GrowthRates { get; set; }      // 레벨당 증가량
+    public int Rebirths { get; set; }           // 환생 횟수, 환생 시 growthRates증가, 기존 레벨당 증가량 격차만큼 능력치 보정
 
-  // 상태
-  isDead: boolean;
-  isInParty: boolean;
-  equippedItems: {
-    weapon?: string;       // equipment ID
-    armor?: string;
-    accessory1?: string;
-    accessory2?: string;
-  };
+    // 효과 (★4+)
+    public List<Effect>? UniqueEffects { get; set; }
+
+    // 상태
+    public bool IsDead { get; set; }
+    public bool IsInParty { get; set; }
+    public EquippedItems EquippedItems { get; set; }
 }
 
-type Element = "water" | "fire" | "earth" | "none";
-
-interface Stats { // critical_rate, critical_damage, block_rate는 성장치와 영향 없음
-  hp: number;
-  attack: number;
-  defense: number;
+public class HeroStats
+{
+    public float Hp { get; set; }
+    public float MaxHp { get; set; }
+    public float Attack { get; set; }
+    public float Defense { get; set; }
+    public float CriticalRate { get; set; }
+    public float CriticalDamage { get; set; }
+    public float BlockRate { get; set; }
 }
 
-interface Effect {
-  id: string;
-  name: string;
-  description: string;
-  type: "offensive" | "defensive" | "utility";
-  value: number;
+public class EquippedItems
+{
+    public string? Weapon { get; set; }         // equipment ID
+    public string? Armor { get; set; }
+    public string? Accessory1 { get; set; }
+    public string? Accessory2 { get; set; }
+}
+
+public enum Element
+{
+    Water,
+    Fire,
+    Earth,
+    None
+}
+
+public class Stats // critical_rate, critical_damage, block_rate는 성장치와 영향 없음
+{
+    public float Hp { get; set; }
+    public float Attack { get; set; }
+    public float Defense { get; set; }
+}
+
+public class Effect
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public EffectType Type { get; set; }
+    public float Value { get; set; }
+}
+
+public enum EffectType
+{
+    Offensive,
+    Defensive,
+    Utility
 }
 ```
 
 ### Equipment (장비)
 
-```typescript
-interface Equipment {
-  // 식별
-  id: string;
-  templateId: string;
+```csharp
+using System;
+using System.Collections.Generic;
 
-  // 기본 정보
-  name: string;
-  grade: Grade;
-  type: EquipmentType;
-  requiredLevel: number;
+public class Equipment
+{
+    // 식별
+    public string Id { get; set; }
+    public string TemplateId { get; set; }
 
-  // 스탯
-  baseStat: {
-    type: "attack" | "defense" | "hp";
-    value: number;
-  };
+    // 기본 정보
+    public string Name { get; set; }
+    public Grade Grade { get; set; }
+    public EquipmentType Type { get; set; }
+    public int RequiredLevel { get; set; }
 
-  // 옵션
-  options: EquipmentOption[];
+    // 스탯
+    public BaseStat BaseStat { get; set; }
 
-  // 상태
-  equipped: boolean;
-  equippedBy?: string;     // hero ID
+    // 옵션
+    public List<EquipmentOption> Options { get; set; }
+
+    // 상태
+    public bool Equipped { get; set; }
+    public string? EquippedBy { get; set; }     // hero ID
 }
 
-type Grade = "C" | "UC" | "R" | "H" | "L";
-type EquipmentType = "weapon" | "armor" | "ring" | "neckless" | "belt";
+public class BaseStat
+{
+    public string Type { get; set; }            // "attack" | "defense" | "hp"
+    public float Value { get; set; }
+}
 
-interface EquipmentOption {
-  type: "offensive" | "defensive" | "utility";
-  stat: string;            // "추가 공격", "드랍률" 등
-  value: number;
+public enum Grade
+{
+    C,
+    UC,
+    R,
+    H,
+    L
+}
+
+public enum EquipmentType
+{
+    Weapon,
+    Armor,
+    Ring,
+    Neckless,
+    Belt
+}
+
+public class EquipmentOption
+{
+    public string Type { get; set; }            // "offensive" | "defensive" | "utility"
+    public string Stat { get; set; }            // "추가 공격", "드랍률" 등
+    public float Value { get; set; }
 }
 ```
 
 ### Combat (전투)
 
-```typescript
-interface Combat {
-  combatId: string;
+```csharp
+using System;
+using System.Collections.Generic;
 
-  // 참가자
-  playerParty: Hero[];
-  enemyParty: Enemy[];
+public class Combat
+{
+    public string CombatId { get; set; }
 
-  // 배치
-  gridPositions: {
-    player: (Hero | null)[];   // length 9
-    enemy: (Enemy | null)[];   // length 9
-  };
+    // 참가자
+    public List<Hero> PlayerParty { get; set; }
+    public List<Enemy> EnemyParty { get; set; }
 
-  // 진행 상태
-  currentRound: number;
-  maxRound: number;
-  isFinished: boolean;
+    // 배치
+    public GridPositions GridPositions { get; set; }
 
-  // 기록
-  log: CombatAction[];
+    // 진행 상태
+    public int CurrentRound { get; set; }
+    public int MaxRound { get; set; }
+    public bool IsFinished { get; set; }
+
+    // 기록
+    public List<CombatAction> Log { get; set; }
 }
 
-interface CombatAction {
-  round: number;
-  actorId: string;
-  targetId: string;
-  damage: number;
-  elementBonus: number;
-  targetDied: boolean;
+public class GridPositions
+{
+    public Hero?[] Player { get; set; }         // length 9
+    public Enemy?[] Enemy { get; set; }         // length 9
 }
 
-interface CombatResult {
-  victory: boolean;
-  survivors: Hero[];
-  dead: Hero[];
-  expGained: Map<string, number>;  // heroId -> exp
-  itemsDropped: Equipment[];
-  goldGained: number;
-  roundsElapsed: number;
+public class CombatAction
+{
+    public int Round { get; set; }
+    public string ActorId { get; set; }
+    public string TargetId { get; set; }
+    public float Damage { get; set; }
+    public float ElementBonus { get; set; }
+    public bool TargetDied { get; set; }
+}
+
+public class CombatResult
+{
+    public bool Victory { get; set; }
+    public List<Hero> Survivors { get; set; }
+    public List<Hero> Dead { get; set; }
+    public Dictionary<string, int> ExpGained { get; set; }  // heroId -> exp
+    public List<Equipment> ItemsDropped { get; set; }
+    public int GoldGained { get; set; }
+    public int RoundsElapsed { get; set; }
 }
 ```
 
 ### Territory (영토)
 
-```typescript
-interface Territory {
-  // 소유 타일
-  ownedTiles: Set<string>;   // "x,y" 형식
+```csharp
+using System;
+using System.Collections.Generic;
 
-  // 깃발
-  flags: Flag[];
+public class Territory
+{
+    // 소유 타일
+    public HashSet<string> OwnedTiles { get; set; }   // "x,y" 형식
 
-  // 통계
-  totalArea: number;
-  connectedTowns: string[];  // town IDs
+    // 깃발
+    public List<Flag> Flags { get; set; }
+
+    // 통계
+    public int TotalArea { get; set; }
+    public List<string> ConnectedTowns { get; set; }  // town IDs
 }
 
-interface Flag {
-  id: string;
-  size: 3 | 5 | 7 | 9;
-  position: Position;
-  placedAt: number;          // timestamp
+public class Flag
+{
+    public string Id { get; set; }
+    public int Size { get; set; }               // 3 | 5 | 7 | 9
+    public Position Position { get; set; }
+    public long PlacedAt { get; set; }          // timestamp
 }
 
-interface Position {
-  x: number;
-  y: number;
+public class Position
+{
+    public int X { get; set; }
+    public int Y { get; set; }
 }
 ```
 
 ### World (월드)
 
-```typescript
-interface WorldMap {
-  width: number;
-  height: number;
-  tiles: Tile[][];
+```csharp
+using System;
+using System.Collections.Generic;
 
-  regions: Region[];
-  towns: Town[];
-  fortresses: Fortress[];
+public class WorldMap
+{
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public Tile[][] Tiles { get; set; }
+
+    public List<Region> Regions { get; set; }
+    public List<Town> Towns { get; set; }
+    public List<Fortress> Fortresses { get; set; }
 }
 
-interface Tile {
-  x: number;
-  y: number;
-  type: TileType;
-  tags: string[];            // ["초원_풀숲", "밤"]
+public class Tile
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+    public TileType Type { get; set; }
+    public List<string> Tags { get; set; }      // ["초원_풀숲", "밤"]
 
-  isWalkable: boolean;
-  speedModifier: number;
+    public bool IsWalkable { get; set; }
+    public float SpeedModifier { get; set; }
 
-  fogState: FogState;
-  ownedByPlayer: boolean;
+    public FogState FogState { get; set; }
+    public bool OwnedByPlayer { get; set; }
 }
 
-type TileType = "grass" | "road" | "forest" | "swamp" | "mountain" | "water" | "lava";
-type FogState = "unexplored" | "explored" | "owned";
+public enum TileType
+{
+    Grass,
+    Road,
+    Forest,
+    Swamp,
+    Mountain,
+    Water,
+    Lava
+}
+
+public enum FogState
+{
+    Unexplored,
+    Explored,
+    Owned
+}
 ```
 
 ### Settlement (정착지)
 
-```typescript
-interface Town {
-  id: string;
-  name: string;
-  position: Position;
-  size: number;              // 기본 영토 크기
+```csharp
+using System;
+using System.Collections.Generic;
 
-  owned: boolean;
-  conqueredAt?: number;
+public class Town
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public Position Position { get; set; }
+    public int Size { get; set; }               // 기본 영토 크기
 
-  region: string;
-  difficulty: number;
+    public bool Owned { get; set; }
+    public long? ConqueredAt { get; set; }
 
-  features: {
-    recovery: boolean;       // 회복 기능
-    shop?: Shop;
-  };
+    public string Region { get; set; }
+    public int Difficulty { get; set; }
+
+    public TownFeatures Features { get; set; }
 }
 
-interface Fortress {
-  id: string;
-  name: string;
-  position: Position;
-  size: number;
+public class TownFeatures
+{
+    public bool Recovery { get; set; }          // 회복 기능
+    public Shop? Shop { get; set; }
+}
 
-  unlocked: boolean;
-  unlockedAt?: number;
+public class Fortress
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public Position Position { get; set; }
+    public int Size { get; set; }
 
-  firstBattle: {
-    enemies: Enemy[];
-    rewards: Equipment[];
-  };
+    public bool Unlocked { get; set; }
+    public long? UnlockedAt { get; set; }
 
-  features: {
-    shop: Shop;
-    exchange: Exchange;
-    crafting: CraftingStation;
-  };
+    public FirstBattle FirstBattle { get; set; }
+
+    public FortressFeatures Features { get; set; }
+}
+
+public class FirstBattle
+{
+    public List<Enemy> Enemies { get; set; }
+    public List<Equipment> Rewards { get; set; }
+}
+
+public class FortressFeatures
+{
+    public Shop Shop { get; set; }
+    public Exchange Exchange { get; set; }
+    public CraftingStation Crafting { get; set; }
 }
 ```
 
 ### Player (플레이어)
 
-```typescript
-interface Player {
-  // 기본 정보
-  name: string;
+```csharp
+using System;
+using System.Collections.Generic;
 
-  // 위치
-  position: Position;
-  camping: CampingState | null;
+public class Player
+{
+    // 기본 정보
+    public string Name { get; set; }
 
-  // 소유
-  heroes: Hero[];
-  equipment: Equipment[];
-  gold: number;
+    // 위치
+    public Position Position { get; set; }
+    public CampingState? Camping { get; set; }
 
-  // 파티
-  party: Hero[];             // 최대 4명
+    // 소유
+    public List<Hero> Heroes { get; set; }
+    public List<Equipment> Equipment { get; set; }
+    public int Gold { get; set; }
 
-  // 진행도
-  territory: Territory;
-  rank: Rank;
-  ownedTowns: Set<string>;   // town IDs
-  unlockedFortresses: Set<string>;
+    // 파티
+    public List<Hero> Party { get; set; }       // 최대 4명
 
-  // 메타
-  playTime: number;          // 초
+    // 진행도
+    public Territory Territory { get; set; }
+    public Rank Rank { get; set; }
+    public HashSet<string> OwnedTowns { get; set; }     // town IDs
+    public HashSet<string> UnlockedFortresses { get; set; }
+
+    // 메타
+    public int PlayTime { get; set; }           // 초
 }
 
-interface CampingState {
-  position: Position;
-  startTime: number;
-  healingRate: number;
-  isActive: boolean;
+public class CampingState
+{
+    public Position Position { get; set; }
+    public long StartTime { get; set; }
+    public float HealingRate { get; set; }
+    public bool IsActive { get; set; }
 }
 ```
 
 ### Progression (진행)
 
-```typescript
-interface Rank {
-  id: string;
-  name: string;
-  order: number;
+```csharp
+using System;
+using System.Collections.Generic;
 
-  requirement: {
-    area: number;
-    towns?: number;
-    fortresses?: number;
-  };
+public class Rank
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public int Order { get; set; }
 
-  benefits: {
-    expBonus?: number;
-    dropRateBonus?: number;
-    campingEfficiency?: number;
-    movementSpeed?: number;
-    fortressDiscount?: number;
-    upgradeCostReduction?: number;
-    bossRewardMultiplier?: number;
-    rareDropWeight?: number;
-    specialTokens?: number;
-  };
+    public RankRequirement Requirement { get; set; }
+
+    public RankBenefits Benefits { get; set; }
+}
+
+public class RankRequirement
+{
+    public int Area { get; set; }
+    public int? Towns { get; set; }
+    public int? Fortresses { get; set; }
+}
+
+public class RankBenefits
+{
+    public float? ExpBonus { get; set; }
+    public float? DropRateBonus { get; set; }
+    public float? CampingEfficiency { get; set; }
+    public float? MovementSpeed { get; set; }
+    public float? FortressDiscount { get; set; }
+    public float? UpgradeCostReduction { get; set; }
+    public float? BossRewardMultiplier { get; set; }
+    public float? RareDropWeight { get; set; }
+    public int? SpecialTokens { get; set; }
 }
 ```
 
 ## 헬퍼 타입
 
-```typescript
-// 유틸리티
-type Optional<T> = T | null | undefined;
-type ReadOnly<T> = { readonly [K in keyof T]: T[K] };
+```csharp
+using System;
+using System.Collections.Generic;
 
 // 이벤트
-type GameEvent =
-  | { type: "COMBAT_START"; data: { enemies: Enemy[] } }
-  | { type: "COMBAT_END"; data: { result: CombatResult } }
-  | { type: "TOWN_CONQUERED"; data: { town: Town } }
-  | { type: "RANK_UP"; data: { newRank: Rank } }
-  | { type: "LEVEL_UP"; data: { hero: Hero } }
-  | { type: "FLAG_PLACED"; data: { flag: Flag } };
+public abstract class GameEvent
+{
+    public string Type { get; set; }
+}
+
+public class CombatStartEvent : GameEvent
+{
+    public CombatStartData Data { get; set; }
+}
+
+public class CombatStartData
+{
+    public List<Enemy> Enemies { get; set; }
+}
+
+public class CombatEndEvent : GameEvent
+{
+    public CombatEndData Data { get; set; }
+}
+
+public class CombatEndData
+{
+    public CombatResult Result { get; set; }
+}
+
+public class TownConqueredEvent : GameEvent
+{
+    public TownConqueredData Data { get; set; }
+}
+
+public class TownConqueredData
+{
+    public Town Town { get; set; }
+}
+
+public class RankUpEvent : GameEvent
+{
+    public RankUpData Data { get; set; }
+}
+
+public class RankUpData
+{
+    public Rank NewRank { get; set; }
+}
+
+public class LevelUpEvent : GameEvent
+{
+    public LevelUpData Data { get; set; }
+}
+
+public class LevelUpData
+{
+    public Hero Hero { get; set; }
+}
+
+public class FlagPlacedEvent : GameEvent
+{
+    public FlagPlacedData Data { get; set; }
+}
+
+public class FlagPlacedData
+{
+    public Flag Flag { get; set; }
+}
 ```
 
 ## 데이터 검증
 
-```typescript
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 // 예시: 영웅 생성 검증
-function validateHero(hero: Hero): boolean {
-  if (hero.starGrade < 1 || hero.starGrade > 6) return false;
-  if (hero.level < 1) return false;
-  if (hero.stats.hp < 0) return false;
-  return true;
+public static bool ValidateHero(Hero hero)
+{
+    if (hero.StarGrade < 1 || hero.StarGrade > 6) return false;
+    if (hero.Level < 1) return false;
+    if (hero.Stats.Hp < 0) return false;
+    return true;
 }
 
 // 파티 검증
-function validateParty(party: Hero[]): boolean {
-  if (party.length > 4) return false;
-  const uniqueIds = new Set(party.map(h => h.id));
-  if (uniqueIds.size !== party.length) return false;  // 중복 불가
-  return true;
+public static bool ValidateParty(List<Hero> party)
+{
+    if (party.Count > 4) return false;
+    var uniqueIds = new HashSet<string>(party.Select(h => h.Id));
+    if (uniqueIds.Count != party.Count) return false;  // 중복 불가
+    return true;
 }
 ```
 

@@ -173,28 +173,12 @@ future_income:
 
 ## 데이터 구조
 
-```typescript
-interface Flag {
-  id: string;
-  size: 3 | 5 | 7;
-  position: { x: number; y: number };
-  placedAt: number;  // timestamp
-}
+> 영토 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-interface Territory {
-  tiles: Set<string>;  // "x,y" 형식
-  flags: Flag[];
-  totalArea: number;
-  connectedTowns: string[];  // town IDs
-}
-
-interface FlagPlacement {
-  validate(x: number, y: number, size: number): boolean;
-  place(x: number, y: number, size: number): boolean;
-  remove(flagId: string): boolean;
-  getOwnedTiles(): Set<string>;
-}
-```
+주요 개념:
+- **Flag**: 깃발 정보 (크기, 위치, 설치 시간)
+- **Territory**: 영토 정보 (소유 타일 목록, 깃발 목록, 연결된 마을)
+- **FlagPlacement**: 깃발 설치 로직 (검증, 설치, 제거)
 
 ## UI 요구사항
 

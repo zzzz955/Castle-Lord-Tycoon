@@ -150,10 +150,37 @@ roop:
 ## 기술 스택
 
 ```yaml
-engine: "Unity"
-language: "TypeScript/C#"
-graphics: "2D 아이소메트릭"
-data_format: "JSON"
+# === CLIENT ===
+client:
+  engine: "Unity 2022.3.62f2 LTS"
+  language: "C# 9.0"
+  target_platform: "Android"
+  graphics: "2D 아이소메트릭"
+
+# === SERVER ===
+server:
+  framework: "ASP.NET Core 8.0 LTS"
+  language: "C# 12.0"
+  architecture: "모놀리식 (Auth + Game + Logging 통합)"
+  websocket: "SignalR"
+  api: "REST API"
+
+# === DATABASE ===
+database:
+  primary: "PostgreSQL 17"
+  cache: "Redis 7"
+  logging: "MongoDB 7"
+
+# === DEPLOYMENT ===
+deployment:
+  containerization: "Docker + Docker Compose"
+  reverse_proxy: "Nginx"
+  ssl: "Let's Encrypt"
+  ci_cd: "GitHub Actions"
+  hosting: "온프레미스 서버"
+
+# === DATA ===
+data_format: "JSON (config), PostgreSQL (game state)"
 ```
 
 ---

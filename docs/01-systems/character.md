@@ -84,33 +84,30 @@ derived_stats:
 
 ### 스탯 성장
 
-```typescript
-interface HeroGrowth {
-  growth_rate: 영웅 성장치
-  baseStats: {
-    hp: number;
-    attack: number;
-    defense: number;
-  };
-  growthRates: {
-    hp: number;    // 레벨당 증가량, 영웅 성장치 비례 증가
-    attack: number;
-    defense: number;
-  };
-}
+```yaml
+growth_system:
+  components:
+    growth_rate: "영웅 성장치 (별 등급별 차이)"
+    base_stats: "레벨 1 기준 스탯"
+    growth_rates: "레벨당 증가량 (성장치 비례)"
 
-// 예시
-const hero_star_1: HeroGrowth = {
-  growth_rate: 10,
-  baseStats: { hp: 50, attack: 10, defense: 5 },
-  growthRates: { hp: 5, attack: 1, defense: 0.5 }
-};
+  formula:
+    stat_at_level: "기본 스탯 + (성장률 × (레벨 - 1))"
+    growth_affected: "hp, attack, defense"
+    fixed: "critical_rate, critical_damage, block_rate"
 
-const hero_star_6: HeroGrowth = {
-  growth_rate: 60,
-  baseStats: { hp: 200, attack: 32, defense: 20 },
-  growthRates: { hp: 30, attack: 6, defense: 3 }
-};
+example_comparison:
+  star_1:
+    growth_rate: 10
+    base: "HP 50, 공격 10, 방어 5"
+    per_level: "HP +5, 공격 +1, 방어 +0.5"
+
+  star_6:
+    growth_rate: 60
+    base: "HP 200, 공격 32, 방어 20"
+    per_level: "HP +30, 공격 +6, 방어 +3"
+
+  note: "6성은 1성 대비 성장률 6배"
 ```
 
 ## 고유 효과 (★4 이상)
@@ -155,17 +152,14 @@ star_6_effects:
 
 ### 경험치 곡선
 
-```typescript
-function getRequiredExp(level: number): number {
-  // 간단한 선형 증가 (조정 가능)
-  return Math.floor(100 * Math.pow(level, 1.5));
-}
+```yaml
+exp_formula:
+  formula: "100 × level^1.5"
 
-// 예시
-// Lv1→2: 100
-// Lv2→3: 282
-// Lv3→4: 519
-// ...
+examples:
+  Lv1→2: 100
+  Lv2→3: 282
+  Lv3→4: 519
 ```
 
 ### 레벨 상한
@@ -234,49 +228,14 @@ acquisition:
 
 ## 데이터 구조
 
-```typescript
-interface Hero {
-  // 고유 식별
-  id: string;
-  templateId: string;  // 영웅 종류 (같은 영웅, 다른 별)
-  type: string; // 영웅 타입 (공격, 방어, 특화)
+> 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-  // 등급
-  starGrade: 1 | 2 | 3 | 4 | 5 | 6;
-
-  // 기본 정보
-  name: string;
-  element: "water" | "fire" | "earth" | "none";
-
-  // 스탯
-  level: number;
-  currentExp: number;
-  stats: {
-    hp: number;
-    maxHp: number;
-    attack: number;
-    defense: number;
-    critical_rate: number;
-    critical_damage: number;
-    block_rate: number;
-  };
-
-  // 효과 (★4 이상)
-  uniqueEffects?: Effect[];
-
-  // 상태
-  isDead: boolean;
-  isInParty: boolean;
-}
-
-interface Effect {
-  id: string;
-  name: string;
-  description: string;
-  value: number;
-  type: "offensive" | "defensive" | "utility";
-}
-```
+주요 개념:
+- **Hero**: 영웅 정보 (별 등급, 레벨, 스탯, 고유 효과)
+- **별 등급 시스템**: 1~6성 (성장률, 고유효과 여부)
+- **스탯**: HP, 공격, 방어, 치명타율/데미지, 회피율
+- **고유 효과**: ★4 이상 전용 (공격/방어/유틸리티 효과)
+- **속성**: 물/불/땅/무
 
 ## UI 요구사항
 

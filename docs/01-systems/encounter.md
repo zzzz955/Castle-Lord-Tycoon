@@ -72,19 +72,25 @@ spawn_table_example:
 
 ### 가중치 시스템
 
-```typescript
-function selectMonster(table: SpawnTable): Monster {
-  const totalWeight = table.monsters.reduce((sum, m) => sum + m.weight, 0);
-  const roll = random(0, totalWeight);
+```yaml
+weighted_random:
+  algorithm: "가중치 기반 확률 선택"
 
-  let current = 0;
-  for (const entry of table.monsters) {
-    current += entry.weight;
-    if (roll <= current) {
-      return createMonster(entry.id, randomLevel(entry.level_range));
-    }
-  }
-}
+  process:
+    1: "전체 가중치 합 계산"
+    2: "0 ~ 전체 가중치 범위에서 난수 생성"
+    3: "누적 가중치로 몬스터 선택"
+
+  example:
+    monsters:
+      - id: "goblin", weight: 70
+      - id: "orc", weight: 20
+      - id: "troll", weight: 10
+
+    probability:
+      goblin: "70/100 = 70%"
+      orc: "20/100 = 20%"
+      troll: "10/100 = 10%"
 ```
 
 ## 지역 난이도
@@ -148,32 +154,13 @@ composition:
 
 ## 데이터 구조
 
-```typescript
-interface SpawnTable {
-  tag: string;
-  encounterRate: number;  // 0-100%
-  monsters: MonsterEntry[];
-}
+> 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-interface MonsterEntry {
-  id: string;
-  weight: number;
-  levelRange: [number, number];
-  maxCount?: number;  // 최대 동시 출현 수
-}
-
-interface EncounterResult {
-  enemies: Monster[];
-  gridPositions: (Monster | null)[];  // length 9
-}
-
-interface Region {
-  id: string;
-  name: string;
-  difficulty: number;
-  spawnTables: Map<string, SpawnTable>;  // tag -> table
-}
-```
+주요 개념:
+- **SpawnTable**: 타일 태그별 몬스터 출현 테이블 (조우율, 몬스터 목록, 가중치)
+- **MonsterEntry**: 몬스터 출현 정보 (ID, 가중치, 레벨 범위)
+- **EncounterResult**: 조우 결과 (적 목록, 그리드 배치)
+- **Region**: 지역 정보 (난이도, 스폰 테이블 매핑)
 
 ## 조우 확률 조정
 

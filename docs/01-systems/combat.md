@@ -106,24 +106,19 @@ disadvantage_table:
 
 ### 데미지 계산
 
-```typescript
-function calculateDamage(
-  attacker: Hero,
-  defender: Hero
-): number {
-  let baseDamage = attacker.attack - defender.defense;
-  if (baseDamage < 1) baseDamage = 1;
+```yaml
+formula:
+  base_damage: "공격력 - 방어력 (최소 1)"
+  element_bonus: "±30% (속성 상성)"
+  final_damage: "기본 데미지 × (1 + 속성 보너스)"
 
-  // 속성 상성 적용
-  const elementBonus = getElementModifier(
-    attacker.element,
-    defender.element
-  ); // ±30%
-
-  const finalDamage = baseDamage * (1 + elementBonus);
-
-  return Math.floor(finalDamage);
-}
+example:
+  attacker: "공격력 100, 불 속성"
+  defender: "방어력 30, 땅 속성"
+  calculation:
+    base: "100 - 30 = 70"
+    element: "불 > 땅 = +30%"
+    final: "70 × 1.3 = 91"
 ```
 
 ## 보상 시스템
@@ -228,38 +223,12 @@ result_screen:
 
 ## 데이터 구조
 
-```typescript
-interface Combat {
-  combatId: string;
-  playerParty: Hero[];
-  enemyParty: Enemy[];
-  gridPositions: {
-    player: (Hero | null)[];  // length 9
-    enemy: (Enemy | null)[];  // length 9
-  };
-  currentRound: number;
-  maxRound: number;
-  log: CombatAction[];
-}
+> 전투 관련 데이터 구조는 `docs/04-technical/data-structures.md`를 참조하세요.
 
-interface CombatAction {
-  round: number;
-  actorId: string;
-  targetId: string;
-  damage: number;
-  elementBonus: number;
-  targetDied: boolean;
-}
-
-interface CombatResult {
-  victory: boolean;
-  survivors: Hero[];
-  dead: Hero[];
-  expGained: Map<string, number>;  // heroId -> exp
-  itemsDropped: Item[];
-  goldGained: number;
-}
-```
+주요 개념:
+- **Combat**: 전투 세션 정보 (참가자, 그리드 배치, 라운드)
+- **CombatAction**: 각 행동 로그 (공격자, 대상, 데미지)
+- **CombatResult**: 전투 결과 (승패, 생존자, 보상)
 
 ## 밸런스 파라미터
 
