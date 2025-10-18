@@ -6,10 +6,11 @@ Castle Lord Tycoon 배포 및 운영 가이드입니다.
 
 **Infrastructure**:
 - Server: ASP.NET Core 8.0
-- Database: PostgreSQL 15
-- Reverse Proxy: Nginx
+- Database: PostgreSQL 17
+- Cache: Redis 7
+- Reverse Proxy: Nginx (기존 서버 사용)
 - Containerization: Docker + Docker Compose
-- SSL: Let's Encrypt (Certbot)
+- SSL: Let's Encrypt (기존 서버 Certbot 사용)
 - CI/CD: GitHub Actions
 
 ---
@@ -23,24 +24,25 @@ Castle Lord Tycoon 배포 및 운영 가이드입니다.
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Nginx (Reverse Proxy + SSL Termination)               │
-│  - api.castlelordtycoon.com    → Backend API           │
-│  - ws.castlelordtycoon.com     → SignalR WebSocket     │
-│  - www.castlelordtycoon.com    → Static Website        │
-└────────────┬───────────────────────┬────────────────────┘
-             │                       │
-             ▼                       ▼
+│  기존 Nginx (Reverse Proxy + SSL Termination)          │
+│  - castle.yourdomain.com → Game Server                 │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│  Game Server Container (Docker)                         │
+│  - REST API: /api/*                                     │
+│  - SignalR WebSocket: /hub/*                            │
+│  - External Port: 10010                                 │
+│  - Internal Port: 8080                                  │
+└────────┬────────────────────────┬───────────────────────┘
+         │                        │
+         ▼                        ▼
 ┌────────────────────┐   ┌──────────────────────┐
-│  API Container     │   │  SignalR Container   │
-│  Port: 5000        │   │  Port: 5001          │
-└────────┬───────────┘   └──────────┬───────────┘
-         │                          │
-         └──────────┬───────────────┘
-                    ▼
-         ┌──────────────────────┐
-         │  PostgreSQL          │
-         │  Port: 5432          │
-         └──────────────────────┘
+│  PostgreSQL 17     │   │  Redis 7             │
+│  External: 10001   │   │  External: 10002     │
+│  Internal: 5432    │   │  Internal: 6379      │
+└────────────────────┘   └──────────────────────┘
 ```
 
 ---
@@ -55,7 +57,7 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: castle-db
     restart: unless-stopped
     environment:
@@ -67,7 +69,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-10001}:5432"
     networks:
       - castle-network
     healthcheck:
@@ -75,6 +77,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: castle-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-10002}:6379"
+    networks:
+      - castle-network
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
 
   # Backend API Server
   api:
@@ -85,7 +100,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT:-Production}
-      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${DB_NAME:-castlelord};Username=${DB_USER:-admin};Password=${DB_PASSWORD}
       - JWT__Secret=${JWT_SECRET}
       - JWT__Issuer=${JWT_ISSUER:-CastleLordTycoon}
@@ -93,7 +108,7 @@ services:
       - JWT__ExpirationMinutes=${JWT_EXPIRATION:-60}
       - Redis__ConnectionString=redis:6379
     ports:
-      - "5000:5000"
+      - "${API_PORT:-10010}:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -104,51 +119,10 @@ services:
     volumes:
       - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: castle-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    networks:
-      - castle-network
-    volumes:
-      - redis-data:/data
-    command: redis-server --appendonly yes
-
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: castle-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
-      - ./logs/nginx:/var/log/nginx
-    depends_on:
-      - api
-    networks:
-      - castle-network
-
-  # Certbot for SSL
-  certbot:
-    image: certbot/certbot
-    container_name: castle-certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   postgres-data:
@@ -202,7 +176,7 @@ COPY --from=publish /app/publish .
 RUN mkdir -p /app/logs
 
 # Expose port
-EXPOSE 5000
+EXPOSE 8080
 
 # Run application
 ENTRYPOINT ["dotnet", "CastleLordTycoon.API.dll"]
@@ -210,83 +184,27 @@ ENTRYPOINT ["dotnet", "CastleLordTycoon.API.dll"]
 
 ---
 
-## 3. Nginx Configuration
+## 3. 기존 Nginx 설정 업데이트
 
-### 3.1 nginx/nginx.conf
+### 3.1 서브도메인 설정 파일 생성
 
-```nginx
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log warn;
-pid /var/run/nginx.pid;
+기존 Nginx 서버에 새 게임용 설정 추가:
 
-events {
-    worker_connections 1024;
-}
-
-http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                    '$status $body_bytes_sent "$http_referer" '
-                    '"$http_user_agent" "$http_x_forwarded_for"';
-
-    access_log /var/log/nginx/access.log main;
-
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
-    types_hash_max_size 2048;
-
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css text/xml text/javascript
-               application/json application/javascript application/xml+rss
-               application/rss+xml font/truetype font/opentype
-               application/vnd.ms-fontobject image/svg+xml;
-
-    # Include site configurations
-    include /etc/nginx/conf.d/*.conf;
-}
-```
-
----
-
-### 3.2 nginx/conf.d/api.conf
+**파일**: `/etc/nginx/sites-available/castle-lord-tycoon`
 
 ```nginx
-# HTTP to HTTPS redirect
-server {
-    listen 80;
-    server_name api.castlelordtycoon.com;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
-
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-# HTTPS API Server
 server {
     listen 443 ssl http2;
-    server_name api.castlelordtycoon.com;
+    server_name castle.yourdomain.com;
 
-    # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/api.castlelordtycoon.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api.castlelordtycoon.com/privkey.pem;
+    # SSL 인증서 (Let's Encrypt)
+    ssl_certificate /etc/letsencrypt/live/castle.yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/castle.yourdomain.com/privkey.pem;
+
+    # SSL 설정
     ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
 
     # Security Headers
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -294,178 +212,101 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 
-    # Rate Limiting
-    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=100r/m;
-    limit_req zone=api_limit burst=150 nodelay;
-
-    # Client Body Size
-    client_max_body_size 10M;
-
-    # API Proxy
-    location / {
-        proxy_pass http://api:5000;
+    # REST API
+    location /api/ {
+        proxy_pass http://localhost:10010/api/;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection keep-alive;
+
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
 
-        # Timeouts
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
     }
 
-    # Health Check Endpoint (no rate limit)
-    location /health {
-        proxy_pass http://api:5000/health;
-        access_log off;
-    }
-}
-```
-
----
-
-### 3.3 nginx/conf.d/websocket.conf
-
-```nginx
-# SignalR WebSocket Configuration
-upstream signalr_backend {
-    ip_hash; # Sticky sessions for WebSocket
-    server api:5000;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name ws.castlelordtycoon.com;
-
-    # SSL Configuration (same as API)
-    ssl_certificate /etc/letsencrypt/live/ws.castlelordtycoon.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ws.castlelordtycoon.com/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-
-    # WebSocket specific settings
-    location /hubs/game {
-        proxy_pass http://signalr_backend;
+    # SignalR WebSocket
+    location /hub/ {
+        proxy_pass http://localhost:10010/hub/;
         proxy_http_version 1.1;
 
-        # WebSocket headers
+        # WebSocket 필수 헤더
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
 
-        # Disable buffering for WebSocket
-        proxy_buffering off;
-
-        # Extended timeouts for long-lived connections
+        # WebSocket 타임아웃 (장시간 유지)
         proxy_connect_timeout 7d;
         proxy_send_timeout 7d;
         proxy_read_timeout 7d;
     }
+
+    # Swagger (개발 환경)
+    location /swagger/ {
+        proxy_pass http://localhost:10010/swagger/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
+    # Health Check
+    location /health {
+        proxy_pass http://localhost:10010/health;
+        access_log off;
+    }
+}
+
+# HTTP → HTTPS 리다이렉트
+server {
+    listen 80;
+    server_name castle.yourdomain.com;
+    return 301 https://$server_name$request_uri;
 }
 ```
 
----
-
-## 4. SSL Certificate Setup (Let's Encrypt)
-
-### 4.1 Initial Certificate Acquisition
+### 3.2 설정 활성화
 
 ```bash
-#!/bin/bash
-# scripts/init-letsencrypt.sh
+# 심볼릭 링크 생성
+sudo ln -s /etc/nginx/sites-available/castle-lord-tycoon /etc/nginx/sites-enabled/
 
-domains=(api.castlelordtycoon.com ws.castlelordtycoon.com)
-rsa_key_size=4096
-data_path="./certbot"
-email="admin@castlelordtycoon.com" # 실제 이메일로 변경
-staging=0 # 테스트는 1, 운영은 0
+# 설정 테스트
+sudo nginx -t
 
-# Download recommended TLS parameters
-if [ ! -e "$data_path/conf/options-ssl-nginx.conf" ]; then
-  echo "### Downloading recommended TLS parameters..."
-  mkdir -p "$data_path/conf"
-  curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf > "$data_path/conf/options-ssl-nginx.conf"
-  curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem > "$data_path/conf/ssl-dhparams.pem"
-fi
-
-echo "### Creating dummy certificate for $domains..."
-path="/etc/letsencrypt/live/${domains[0]}"
-mkdir -p "$data_path/conf/live/${domains[0]}"
-docker-compose run --rm --entrypoint "\
-  openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1\
-    -keyout '$path/privkey.pem' \
-    -out '$path/fullchain.pem' \
-    -subj '/CN=localhost'" certbot
-
-echo "### Starting nginx..."
-docker-compose up -d nginx
-
-echo "### Deleting dummy certificate..."
-docker-compose run --rm --entrypoint "\
-  rm -Rf /etc/letsencrypt/live/${domains[0]} && \
-  rm -Rf /etc/letsencrypt/archive/${domains[0]} && \
-  rm -Rf /etc/letsencrypt/renewal/${domains[0]}.conf" certbot
-
-echo "### Requesting Let's Encrypt certificate for $domains..."
-domain_args=""
-for domain in "${domains[@]}"; do
-  domain_args="$domain_args -d $domain"
-done
-
-case "$staging" in
-  1) staging_arg="--staging" ;;
-  *) staging_arg="" ;;
-esac
-
-docker-compose run --rm --entrypoint "\
-  certbot certonly --webroot -w /var/www/certbot \
-    $staging_arg \
-    $domain_args \
-    --email $email \
-    --rsa-key-size $rsa_key_size \
-    --agree-tos \
-    --force-renewal" certbot
-
-echo "### Reloading nginx..."
-docker-compose exec nginx nginx -s reload
+# Nginx 재시작
+sudo systemctl reload nginx
 ```
 
-**실행**:
+### 3.3 Let's Encrypt SSL 인증서 발급
+
 ```bash
-chmod +x scripts/init-letsencrypt.sh
-./scripts/init-letsencrypt.sh
+# 새 서브도메인 인증서 발급
+sudo certbot --nginx -d castle.yourdomain.com
+
+# 자동 갱신 확인
+sudo certbot renew --dry-run
 ```
+
+**참고**: 기존 게임의 인증서와 독립적으로 관리됩니다.
 
 ---
 
-### 4.2 Automatic Renewal
+## 4. Environment Variables
 
-Certbot 컨테이너가 12시간마다 자동으로 갱신을 시도합니다 (docker-compose.yml 설정).
-
-**수동 갱신**:
-```bash
-docker-compose run --rm certbot renew
-docker-compose exec nginx nginx -s reload
-```
-
----
-
-## 5. Environment Variables
-
-### 5.1 .env File (Production)
+### 4.1 .env File (Production)
 
 ```bash
 # .env (서버에 직접 배치, Git에는 커밋하지 않음)
 
 # Environment
 ENVIRONMENT=Production
+
+# 포트 설정 (10000번대 사용)
+POSTGRES_PORT=10001
+REDIS_PORT=10002
+API_PORT=10010
 
 # Database
 DB_NAME=castlelord_prod
@@ -490,27 +331,38 @@ openssl rand -base64 32
 
 ---
 
-### 5.2 .env.example (Git 커밋용)
+### 4.2 .env.example (Git 커밋용)
 
 ```bash
 # .env.example (템플릿)
 
 ENVIRONMENT=Production
+
+# 포트 설정 (10000번대 사용)
+POSTGRES_PORT=10001
+REDIS_PORT=10002
+API_PORT=10010
+
+# Database
 DB_NAME=castlelord_prod
 DB_USER=admin
 DB_PASSWORD=<CHANGE_ME>
+
+# JWT
 JWT_SECRET=<CHANGE_ME>
 JWT_ISSUER=CastleLordTycoon
 JWT_AUDIENCE=CastleLordTycoonClient
 JWT_EXPIRATION=60
+
+# Admin
 ADMIN_EMAIL=admin@example.com
 ```
 
 ---
 
-## 6. GitHub Actions CI/CD
+## 5. GitHub Actions CI/CD
 
-### 6.1 .github/workflows/deploy.yml
+### 5.1 .github/workflows/deploy.yml
 
 ```yaml
 name: Deploy to Production
@@ -595,7 +447,7 @@ jobs:
 
 ---
 
-### 6.2 Required GitHub Secrets
+### 5.2 Required GitHub Secrets
 
 Settings → Secrets and variables → Actions에서 설정:
 
@@ -609,9 +461,9 @@ SSH_PRIVATE_KEY: SSH 개인키 (id_rsa 내용)
 
 ---
 
-## 7. Server Setup Guide
+## 6. Server Setup Guide
 
-### 7.1 Initial Server Configuration
+### 6.1 Initial Server Configuration
 
 ```bash
 # Ubuntu 22.04 LTS 기준
@@ -639,16 +491,19 @@ git clone https://github.com/yourusername/castle-lord-tycoon.git .
 cp .env.example .env
 nano .env  # 비밀번호 설정
 
-# 방화벽 설정
-sudo ufw allow 22/tcp   # SSH
-sudo ufw allow 80/tcp   # HTTP
-sudo ufw allow 443/tcp  # HTTPS
+# 방화벽 설정 (10000번대 포트 추가)
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS
+sudo ufw allow 10001/tcp # PostgreSQL (필요시)
+sudo ufw allow 10002/tcp # Redis (필요시)
+sudo ufw allow 10010/tcp # Game Server (필요시)
 sudo ufw enable
 ```
 
 ---
 
-### 7.2 Database Initialization
+### 6.2 Database Initialization
 
 ```sql
 -- scripts/init-db.sql
@@ -668,16 +523,16 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO analytics_us
 
 ---
 
-## 8. Local Development Setup
+## 7. Local Development Setup
 
-### 8.1 docker-compose.dev.yml
+### 7.1 docker-compose.dev.yml
 
 ```yaml
 version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: castle-db-dev
     environment:
       POSTGRES_DB: castlelord_dev
@@ -712,7 +567,7 @@ dotnet run
 
 ---
 
-### 8.2 appsettings.Development.json
+### 7.2 appsettings.Development.json
 
 ```json
 {
@@ -744,21 +599,22 @@ dotnet run
 
 ---
 
-## 9. Deployment Checklist
+## 8. Deployment Checklist
 
-### 9.1 Pre-Deployment
+### 8.1 Pre-Deployment
 
 - [ ] 모든 테스트 통과 확인
 - [ ] 환경 변수 설정 확인 (.env 파일)
 - [ ] 데이터베이스 백업
 - [ ] SSL 인증서 유효 확인
-- [ ] Nginx 설정 검증: `docker-compose exec nginx nginx -t`
+- [ ] 기존 Nginx 설정 검증: `sudo nginx -t`
 - [ ] Docker 이미지 빌드 성공 확인
 - [ ] 보안 취약점 스캔
+- [ ] 포트 충돌 확인 (10001, 10002, 10010)
 
 ---
 
-### 9.2 Deployment Steps
+### 8.2 Deployment Steps
 
 ```bash
 # 1. 서버 접속
@@ -786,12 +642,12 @@ docker-compose up -d --build
 docker-compose logs -f api
 
 # 9. Health Check
-curl https://api.castlelordtycoon.com/health
+curl https://castle.yourdomain.com/health
 ```
 
 ---
 
-### 9.3 Post-Deployment
+### 8.3 Post-Deployment
 
 - [ ] Health Check 엔드포인트 정상 응답 확인
 - [ ] SignalR 연결 테스트
@@ -802,9 +658,9 @@ curl https://api.castlelordtycoon.com/health
 
 ---
 
-## 10. Monitoring and Logging
+## 9. Monitoring and Logging
 
-### 10.1 Application Logs
+### 9.1 Application Logs
 
 ```bash
 # 실시간 로그 확인
@@ -822,22 +678,22 @@ docker-compose logs api > logs/api-$(date +%Y%m%d).log
 
 ---
 
-### 10.2 Nginx Access Logs
+### 9.2 Nginx Access Logs
 
 ```bash
-# 접속 로그
-tail -f logs/nginx/access.log
+# 접속 로그 (기존 서버 Nginx)
+sudo tail -f /var/log/nginx/access.log
 
 # 에러 로그
-tail -f logs/nginx/error.log
+sudo tail -f /var/log/nginx/error.log
 
 # 특정 IP 필터링
-grep "192.168.1.100" logs/nginx/access.log
+sudo grep "192.168.1.100" /var/log/nginx/access.log
 ```
 
 ---
 
-### 10.3 Database Performance
+### 9.3 Database Performance
 
 ```sql
 -- PostgreSQL 쿼리 성능 모니터링
@@ -852,9 +708,9 @@ log_min_duration_statement = 1000  # 1초 이상 쿼리 로깅
 
 ---
 
-## 11. Backup and Recovery
+## 10. Backup and Recovery
 
-### 11.1 Database Backup
+### 10.1 Database Backup
 
 ```bash
 #!/bin/bash
@@ -885,7 +741,7 @@ crontab -e
 
 ---
 
-### 11.2 Database Restore
+### 10.2 Database Restore
 
 ```bash
 # 백업 파일 복원
@@ -895,9 +751,9 @@ gunzip < /opt/backups/postgres/castlelord_backup_20250115_030000.sql.gz | \
 
 ---
 
-## 12. Scaling Strategies
+## 11. Scaling Strategies
 
-### 12.1 Horizontal Scaling (향후)
+### 11.1 Horizontal Scaling (향후)
 
 ```yaml
 # docker-compose.scale.yml
@@ -907,18 +763,18 @@ services:
       replicas: 3
     # ... (기존 설정)
 
-# Nginx upstream 수정
+# Nginx upstream 수정 (기존 서버 /etc/nginx/sites-available/castle-lord-tycoon)
 upstream api_backend {
     least_conn;
-    server api_1:5000;
-    server api_2:5000;
-    server api_3:5000;
+    server 127.0.0.1:10010;
+    server 127.0.0.1:10011;
+    server 127.0.0.1:10012;
 }
 ```
 
 ---
 
-### 12.2 Database Replication (향후)
+### 11.2 Database Replication (향후)
 
 ```yaml
 # Master-Slave PostgreSQL
@@ -926,7 +782,7 @@ postgres-master:
   # ... (기존 마스터 설정)
 
 postgres-slave:
-  image: postgres:15-alpine
+  image: postgres:17-alpine
   environment:
     POSTGRES_MASTER_SERVICE_HOST: postgres-master
     POSTGRES_REPLICATION_MODE: slave
@@ -935,9 +791,9 @@ postgres-slave:
 
 ---
 
-## 13. Troubleshooting
+## 12. Troubleshooting
 
-### 13.1 Common Issues
+### 12.1 Common Issues
 
 **문제**: 컨테이너가 시작되지 않음
 ```bash
@@ -948,7 +804,7 @@ docker-compose logs api
 docker-compose config
 
 # 포트 충돌 확인
-sudo netstat -tulpn | grep :5000
+sudo netstat -tulpn | grep :10010
 ```
 
 ---
@@ -967,18 +823,32 @@ docker-compose exec postgres psql -U admin -d castlelord_prod -c "SELECT 1;"
 **문제**: SSL 인증서 오류
 ```bash
 # 인증서 유효기간 확인
-openssl x509 -in certbot/conf/live/api.castlelordtycoon.com/fullchain.pem -noout -dates
+sudo openssl x509 -in /etc/letsencrypt/live/castle.yourdomain.com/fullchain.pem -noout -dates
 
 # 인증서 갱신
-docker-compose run --rm certbot renew --force-renewal
-docker-compose exec nginx nginx -s reload
+sudo certbot renew --force-renewal
+sudo systemctl reload nginx
 ```
 
 ---
 
-## 14. Security Hardening
+**문제**: Nginx 설정 오류
+```bash
+# 설정 테스트
+sudo nginx -t
 
-### 14.1 Server Hardening
+# 에러 로그 확인
+sudo tail -f /var/log/nginx/error.log
+
+# Nginx 재시작
+sudo systemctl restart nginx
+```
+
+---
+
+## 13. Security Hardening
+
+### 13.1 Server Hardening
 
 ```bash
 # SSH 키 기반 인증만 허용
@@ -997,7 +867,7 @@ sudo dpkg-reconfigure --priority=low unattended-upgrades
 
 ---
 
-### 14.2 Docker Security
+### 13.2 Docker Security
 
 ```bash
 # Docker 컨테이너 취약점 스캔
@@ -1009,9 +879,9 @@ docker system prune -a --volumes
 
 ---
 
-## 15. Performance Optimization
+## 14. Performance Optimization
 
-### 15.1 Docker Image Optimization
+### 14.1 Docker Image Optimization
 
 ```dockerfile
 # Multi-stage build로 이미지 크기 최소화 (이미 적용됨)
@@ -1021,27 +891,27 @@ docker system prune -a --volumes
 
 ---
 
-### 15.2 Nginx Caching
+### 14.2 Nginx Caching
 
 ```nginx
-# nginx/conf.d/api.conf에 추가
-proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=api_cache:10m max_size=100m inactive=60m;
+# /etc/nginx/sites-available/castle-lord-tycoon에 추가
+proxy_cache_path /var/cache/nginx/castle levels=1:2 keys_zone=castle_cache:10m max_size=100m inactive=60m;
 
 location /api/static/ {
-    proxy_cache api_cache;
+    proxy_cache castle_cache;
     proxy_cache_valid 200 60m;
     proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
     add_header X-Cache-Status $upstream_cache_status;
 
-    proxy_pass http://api:5000;
+    proxy_pass http://localhost:10010/api/static/;
 }
 ```
 
 ---
 
-## 16. Maintenance Windows
+## 15. Maintenance Windows
 
-### 16.1 Planned Maintenance
+### 15.1 Planned Maintenance
 
 ```bash
 #!/bin/bash
@@ -1051,22 +921,22 @@ MODE=$1  # "on" or "off"
 
 if [ "$MODE" = "on" ]; then
     # 503 페이지 활성화
-    docker-compose exec nginx mv /etc/nginx/conf.d/api.conf /etc/nginx/conf.d/api.conf.backup
-    docker-compose exec nginx mv /etc/nginx/conf.d/maintenance.conf.disabled /etc/nginx/conf.d/maintenance.conf
-    docker-compose exec nginx nginx -s reload
+    sudo mv /etc/nginx/sites-enabled/castle-lord-tycoon /etc/nginx/sites-available/castle-lord-tycoon.backup
+    sudo cp /etc/nginx/sites-available/maintenance.conf /etc/nginx/sites-enabled/castle-lord-tycoon
+    sudo systemctl reload nginx
     echo "Maintenance mode: ON"
 else
     # 정상 서비스 복구
-    docker-compose exec nginx mv /etc/nginx/conf.d/maintenance.conf /etc/nginx/conf.d/maintenance.conf.disabled
-    docker-compose exec nginx mv /etc/nginx/conf.d/api.conf.backup /etc/nginx/conf.d/api.conf
-    docker-compose exec nginx nginx -s reload
+    sudo rm /etc/nginx/sites-enabled/castle-lord-tycoon
+    sudo mv /etc/nginx/sites-available/castle-lord-tycoon.backup /etc/nginx/sites-enabled/castle-lord-tycoon
+    sudo systemctl reload nginx
     echo "Maintenance mode: OFF"
 fi
 ```
 
 ---
 
-## 17. Documentation
+## 16. Documentation
 
 - [Client-Server Contract](./client-server-contract.md): API 명세
 - [Security Guidelines](./security-guidelines.md): 보안 정책
@@ -1074,9 +944,26 @@ fi
 
 ---
 
-## 18. Support
+## 17. Support
 
 **문제 발생 시**:
 1. 로그 확인: `docker-compose logs -f`
 2. GitHub Issues 등록
 3. 긴급 상황: admin@castlelordtycoon.com
+
+---
+
+## 18. Port Summary
+
+기존 게임과 충돌 방지를 위해 10000번대 포트 사용:
+
+| 서비스 | 외부 포트 | 내부 포트 | 설명 |
+|--------|----------|----------|------|
+| PostgreSQL | 10001 | 5432 | 데이터베이스 |
+| Redis | 10002 | 6379 | 캐시 서버 |
+| Game Server | 10010 | 8080 | REST API + SignalR |
+
+**중요**:
+- Nginx는 기존 서버의 443/80 포트 사용
+- 컨테이너 간 통신은 내부 포트 사용 (예: postgres:5432)
+- 외부 직접 접속시에만 외부 포트 사용 (예: localhost:10001)
