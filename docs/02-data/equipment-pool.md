@@ -6,7 +6,7 @@
 interface EquipmentTemplate {
   id: string;
   baseName: string;
-  type: "weapon" | "armor" | "accessory";
+  type: "weapon" | "armor" | "ring" | "neckless" | "belt";
 
   levelBands: LevelBand[];
 }
@@ -75,22 +75,27 @@ level_bands:
 ## 옵션 풀
 
 ```yaml
-offensive_options:
-  - "공격 +N"
-  - "치명타 +N%"
-  - "추가공격 +N"
+offensive:
+  - "추가 공격 +N"
+  - "데미지 +N%"
+  - "치명타 확률 +N%"
+  - "치명타 데미지 +N%"
+  - "속성 피해 +N%"
 
-defensive_options:
-  - "방어 +N"
-  - "피해감소 +N%"
+defensive:
+  - "추가 방어 +N"
+  - "피해 감소 +N%"
+  - "치명타 피해 감소 +N%"
+  - "회피 확률 +N%"
+  - "HP +N"
 
-utility_options:
+utility:
   - "드랍률 +N%"
   - "경험치 +N%"
-  - "골드 +N%"
+  - "골드 획득 +N%"
 ```
 
 ---
-**최종 수정**: 2025-01-15
+**최종 수정**: 2025-10-19
 **상태**: ⚪ 미작성 (예시만)
 **작성자**: SangHyeok
