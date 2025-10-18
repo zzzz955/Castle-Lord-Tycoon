@@ -3,7 +3,7 @@ description: 버그 또는 오류를 신고합니다
 title: "[BUG] "
 labels: ["BUG"]
 assignees:
-  - SangHyeok
+  - zzzz955
 
 body:
   - type: markdown
