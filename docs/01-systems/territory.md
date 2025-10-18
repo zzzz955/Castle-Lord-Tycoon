@@ -19,19 +19,19 @@ visualization: "투명화가 적용된 형광 연두빛"
 flag_s:
   name: "소형 깃발"
   size: "3x3"
-  cost: 10  # 골드 (예시)
+  cost: 100  # 골드 (예시)
   unlock: "시작부터"
 
 flag_m:
   name: "중형 깃발"
   size: "5x5"
-  cost: 30
-  unlock: "계급 남작"
+  cost: 500
+  unlock: "계급 자작"
 
 flag_l:
   name: "대형 깃발"
   size: "7x7"
-  cost: 60
+  cost: 2000
   unlock: "계급 후작"
 ```
 
@@ -251,7 +251,7 @@ flag_costs:
 
 available_flags:
   default: 20  # 계급에 상관 없이 기본값
-  expansion: 5  # 계급 증가 시 마다 깃발 배치 가능 개수 증가
+  expansion: 10  # 계급 증가 시 마다 깃발 배치 가능 개수 증가
 
 area_coverage:
   small: 9  # 3x3
