@@ -1,7 +1,9 @@
 name: ✨ Feature Request
 description: 새로운 기능을 제안합니다
 title: "[FEATURE] "
-labels: ["enhancement"]
+labels: ["TASK"]
+assignees:
+  - SangHyeok
 
 body:
   - type: markdown

@@ -1,7 +1,9 @@
 name: 📋 Task
 description: 개발 작업이나 할 일을 기록합니다
 title: "[TASK] "
-labels: ["task"]
+labels: ["TASK"]
+assignees:
+  - SangHyeok
 
 body:
   - type: markdown

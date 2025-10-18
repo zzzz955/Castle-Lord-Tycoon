@@ -1,7 +1,9 @@
 name: 🐛 Bug Report
 description: 버그 또는 오류를 신고합니다
 title: "[BUG] "
-labels: ["bug"]
+labels: ["BUG"]
+assignees:
+  - SangHyeok
 
 body:
   - type: markdown
