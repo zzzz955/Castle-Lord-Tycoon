@@ -252,14 +252,13 @@ interface Hero {
   level: number;
   currentExp: number;
   stats: {
-    hp: double;
-    maxHp: double;
-    attack: double;
-    defense: double;
-    critical_rate: double;
-    critical_damage: double;
-    block_rate: double;
-    luck?: double;
+    hp: number;
+    maxHp: number;
+    attack: number;
+    defense: number;
+    critical_rate: number;
+    critical_damage: number;
+    block_rate: number;
   };
 
   // 효과 (★4 이상)
