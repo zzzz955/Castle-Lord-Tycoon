@@ -39,7 +39,7 @@ namespace GooglePlayGames {
         public const string ApplicationId = "209932296601"; // Filled in automatically
         public const string IosClientId = "__IOS_CLIENTID__"; // Filled in automatically
         public const string WebClientId = "209932296601-n9fs7l3f15801m5sklncu24d2v3614dt.apps.googleusercontent.com"; // Filled in automatically
-        public const string NearbyConnectionServiceId = "";
+        public const string NearbyConnectionServiceId = "com.madalang.CastleLordTycoon";
 
         public static bool ApplicationIdInitialized() {
             return !string.IsNullOrEmpty(ApplicationId) && !ApplicationId.Equals(ToEscapedToken(UnescapedApplicationId));
