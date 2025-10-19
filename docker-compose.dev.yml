@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: castle-postgres-dev
+    ports:
+      - "10001:5432"  # 외부 10001 → 컨테이너 내부 5432
+    environment:
+      POSTGRES_DB: castle_lord_tycoon
+      POSTGRES_USER: gameuser
+      POSTGRES_PASSWORD: dev_password_change_in_production
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - castle-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: castle-redis-dev
+    ports:
+      - "10002:6379"  # 외부 10002 → 컨테이너 내부 6379
+    volumes:
+      - redisdata_dev:/data
+    restart: unless-stopped
+    networks:
+      - castle-network
+
+  # ===== 개발 시에는 game-server를 주석 처리 =====
+  # ASP.NET 서버는 Native 실행 (dotnet watch run)
+  #
+  # game-server:
+  #   build:
+  #     context: ./CastleLordTycoon.Server
+  #     dockerfile: Dockerfile
+  #   container_name: castle-server-dev
+  #   ports:
+  #     - "10010:8080"  # 외부 10010 → 컨테이너 내부 8080
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #     ConnectionStrings__PostgreSQL: "Host=postgres;Port=5432;Database=castle_lord_tycoon;Username=gameuser;Password=dev_password_change_in_production"
+  #     ConnectionStrings__Redis: "redis:6379"
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   networks:
+  #     - castle-network
+  #   restart: unless-stopped
+
+volumes:
+  pgdata_dev:
+    driver: local
+  redisdata_dev:
+    driver: local
+
+networks:
+  castle-network:
+    driver: bridge
