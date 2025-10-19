@@ -65,4 +65,13 @@ namespace CastleLordTycoon.Data
         public string accessToken;
         public int expiresIn;
     }
+
+    /// <summary>
+    /// Google 로그인 요청
+    /// </summary>
+    [Serializable]
+    public class GoogleLoginRequest
+    {
+        public string idToken;
+    }
 }

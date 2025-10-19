@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Network\AuthService.cs" />
     <Compile Include="Assets\Scripts\Network\ApiResponse.cs" />
     <Compile Include="Assets\Scripts\Data\GameModels.cs" />
+    <Compile Include="Assets\Scripts\Core\SecureStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

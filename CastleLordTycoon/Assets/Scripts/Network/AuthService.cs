@@ -1,11 +1,13 @@
 using System;
 using UnityEngine;
 using CastleLordTycoon.Data;
+using CastleLordTycoon.Core;
 
 namespace CastleLordTycoon.Network
 {
     /// <summary>
     /// 인증 서비스 (로그인, 회원가입, 토큰 관리)
+    /// SecureStorage 기반 암호화 저장
     /// </summary>
     public class AuthService : MonoBehaviour
     {
@@ -29,12 +31,19 @@ namespace CastleLordTycoon.Network
         public event Action<string> OnLoginFailed;
         public event Action OnLogout;
 
+        // 메모리 내 사용자 정보 (세션)
         private string _currentUserId;
         private string _currentUsername;
 
         public bool IsLoggedIn => !string.IsNullOrEmpty(_currentUserId);
         public string CurrentUserId => _currentUserId;
         public string CurrentUsername => _currentUsername;
+
+        private void Awake()
+        {
+            // SecureStorage 초기화
+            SecureStorage.Initialize();
+        }
 
         /// <summary>
         /// 회원가입
@@ -90,22 +99,7 @@ namespace CastleLordTycoon.Network
                 {
                     if (response.success)
                     {
-                        // 토큰 저장
-                        HttpClient.Instance.SetAccessToken(response.data.accessToken);
-                        HttpClient.Instance.SetRefreshToken(response.data.refreshToken);
-
-                        // 사용자 정보 저장
-                        _currentUserId = response.data.userId;
-                        _currentUsername = response.data.username;
-
-                        // PlayerPrefs에 리프레시 토큰 저장 (자동 로그인용)
-                        PlayerPrefs.SetString("RefreshToken", response.data.refreshToken);
-                        PlayerPrefs.SetString("UserId", response.data.userId);
-                        PlayerPrefs.SetString("Username", response.data.username);
-                        PlayerPrefs.Save();
-
-                        Debug.Log($"로그인 성공: {_currentUsername}");
-                        OnLoginSuccess?.Invoke(_currentUsername);
+                        SaveAuthData(response.data);
                         callback?.Invoke(true, "로그인 성공");
                     }
                     else
@@ -125,6 +119,42 @@ namespace CastleLordTycoon.Network
         }
 
         /// <summary>
+        /// Google 로그인
+        /// </summary>
+        public void LoginWithGoogle(string idToken, Action<bool, string> callback)
+        {
+            var request = new GoogleLoginRequest
+            {
+                idToken = idToken
+            };
+
+            HttpClient.Instance.Post<GoogleLoginRequest, LoginResponse>(
+                ApiConfig.Auth.GOOGLE_LOGIN,
+                request,
+                response =>
+                {
+                    if (response.success)
+                    {
+                        SaveAuthData(response.data);
+                        callback?.Invoke(true, "Google 로그인 성공");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Google 로그인 실패: {response.error.message}");
+                        OnLoginFailed?.Invoke(response.error.message);
+                        callback?.Invoke(false, response.error.message);
+                    }
+                },
+                error =>
+                {
+                    Debug.LogError($"Google 로그인 요청 실패: {error}");
+                    OnLoginFailed?.Invoke(error);
+                    callback?.Invoke(false, error);
+                }
+            );
+        }
+
+        /// <summary>
         /// 로그아웃
         /// </summary>
         public void Logout()
@@ -133,15 +163,14 @@ namespace CastleLordTycoon.Network
             HttpClient.Instance.SetAccessToken(null);
             HttpClient.Instance.SetRefreshToken(null);
 
-            // 사용자 정보 제거
+            // 메모리 세션 제거
             _currentUserId = null;
             _currentUsername = null;
 
-            // PlayerPrefs 제거
-            PlayerPrefs.DeleteKey("RefreshToken");
-            PlayerPrefs.DeleteKey("UserId");
-            PlayerPrefs.DeleteKey("Username");
-            PlayerPrefs.Save();
+            // 암호화된 저장소에서 제거
+            SecureStorage.DeleteKey("RefreshToken");
+            SecureStorage.DeleteKey("UserId");
+            SecureStorage.DeleteKey("Username");
 
             Debug.Log("로그아웃 완료");
             OnLogout?.Invoke();
@@ -152,7 +181,7 @@ namespace CastleLordTycoon.Network
         /// </summary>
         public void TryAutoLogin(Action<bool> callback)
         {
-            string refreshToken = PlayerPrefs.GetString("RefreshToken", "");
+            string refreshToken = SecureStorage.GetString("RefreshToken");
 
             if (string.IsNullOrEmpty(refreshToken))
             {
@@ -178,8 +207,8 @@ namespace CastleLordTycoon.Network
                         HttpClient.Instance.SetRefreshToken(refreshToken);
 
                         // 사용자 정보 복원
-                        _currentUserId = PlayerPrefs.GetString("UserId", "");
-                        _currentUsername = PlayerPrefs.GetString("Username", "");
+                        _currentUserId = SecureStorage.GetString("UserId");
+                        _currentUsername = SecureStorage.GetString("Username");
 
                         Debug.Log($"자동 로그인 성공: {_currentUsername}");
                         OnLoginSuccess?.Invoke(_currentUsername);
@@ -199,6 +228,28 @@ namespace CastleLordTycoon.Network
                     callback?.Invoke(false);
                 }
             );
+        }
+
+        /// <summary>
+        /// 인증 데이터 저장 (암호화)
+        /// </summary>
+        private void SaveAuthData(LoginResponse data)
+        {
+            // 토큰 설정
+            HttpClient.Instance.SetAccessToken(data.accessToken);
+            HttpClient.Instance.SetRefreshToken(data.refreshToken);
+
+            // 메모리 세션 저장
+            _currentUserId = data.userId;
+            _currentUsername = data.username;
+
+            // 암호화된 로컬 저장소에 저장
+            SecureStorage.SetString("RefreshToken", data.refreshToken);
+            SecureStorage.SetString("UserId", data.userId);
+            SecureStorage.SetString("Username", data.username);
+
+            Debug.Log($"로그인 성공: {_currentUsername}");
+            OnLoginSuccess?.Invoke(_currentUsername);
         }
     }
 }
