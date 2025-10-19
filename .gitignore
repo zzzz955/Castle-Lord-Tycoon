@@ -49,6 +49,11 @@ sysinfo.txt
 *.unitypackage
 *.app
 
+# Keystore (보안 - Git에 절대 올리지 말 것!)
+keystore/
+*.keystore
+*.jks
+
 # ===== OS =====
 # Windows
 Thumbs.db

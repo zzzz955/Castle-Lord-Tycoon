@@ -39,6 +39,20 @@ Castle-Lord-Tycoon/
 ├── docker-compose.dev.yml      # 로컬 개발용
 ├── docker-compose.prod.yml     # 배포용
 ├── .gitignore                  # Git 제외 파일
+├── CastleLordTycoon/           # Unity 클라이언트
+│   ├── Assets/
+│   │   ├── Scripts/            # C# 스크립트
+│   │   │   ├── Core/           # 핵심 시스템
+│   │   │   ├── Network/        # 서버 통신
+│   │   │   ├── UI/             # UI 컨트롤러
+│   │   │   ├── Combat/         # 전투 시스템
+│   │   │   ├── Character/      # 영웅/캐릭터
+│   │   │   ├── World/          # 월드 탐험
+│   │   │   └── Data/           # 데이터 모델
+│   │   ├── Sprites/            # 스프라이트
+│   │   ├── Prefabs/            # 프리팹
+│   │   └── Scenes/             # 씬
+│   └── SETUP.md                # Unity 프로젝트 설정 가이드
 └── CastleLordTycoon.Server/    # ASP.NET Core 서버
     ├── Program.cs              # .env.dev 자동 로드
     ├── appsettings.json        # 기본 설정
@@ -87,10 +101,15 @@ Password: (보안상 .env.dev 참조)
 
 ## 🎯 개발 워크플로우
 
+### 서버 개발
 1. Docker 컨테이너 시작
 2. 서버 디렉토리에서 `dotnet run`
-3. Unity Editor에서 클라이언트 실행
-4. API 테스트 (`http://localhost:5000/weatherforecast`)
+3. API 테스트 (`http://localhost:10010/swagger`)
+
+### 클라이언트 개발
+1. Unity 프로젝트 열기 (`CastleLordTycoon/`)
+2. Unity 설정 가이드 참조 (`CastleLordTycoon/SETUP.md`)
+3. Play 모드로 테스트
 
 ---
 
@@ -98,10 +117,21 @@ Password: (보안상 .env.dev 참조)
 
 자세한 기획 및 기술 문서는 `docs/` 폴더를 참조하세요.
 
+### 기획 문서
 - **게임 개요**: `docs/00-overview/game-concept.md`
 - **시스템 기획**: `docs/01-systems/`
 - **데이터 밸런스**: `docs/02-data/`
-- **기술 문서**: `docs/04-technical/`
+
+### 기술 문서
+- **아키텍처**: `docs/04-technical/architecture.md`
+- **API 명세**: `docs/04-technical/client-server-contract.md`
+- **데이터 구조**: `docs/04-technical/data-structures.md`
+- **Google Sign-In 통합**: `docs/04-technical/google-signin-integration.md`
+- **배포 가이드**: `docs/04-technical/deployment.md`
+
+### Unity 클라이언트
+- **프로젝트 설정**: `CastleLordTycoon/SETUP.md`
+- **프로젝트 개요**: `.claude/project-context.md`
 
 ---
 
