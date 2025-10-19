@@ -5,11 +5,11 @@ services:
     image: postgres:17
     container_name: castle-postgres-dev
     ports:
-      - "10001:5432"  # 외부 10001 → 컨테이너 내부 5432
+      - "${POSTGRES_PORT}:5432"  # .env.dev의 POSTGRES_PORT 사용
     environment:
-      POSTGRES_DB: castle_lord_tycoon
-      POSTGRES_USER: gameuser
-      POSTGRES_PASSWORD: dev_password_change_in_production
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata_dev:/var/lib/postgresql/data
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
     image: redis:7-alpine
     container_name: castle-redis-dev
     ports:
-      - "10002:6379"  # 외부 10002 → 컨테이너 내부 6379
+      - "${REDIS_PORT}:6379"  # .env.dev의 REDIS_PORT 사용
     volumes:
       - redisdata_dev:/data
     restart: unless-stopped
@@ -29,6 +29,7 @@ services:
 
   # ===== 개발 시에는 game-server를 주석 처리 =====
   # ASP.NET 서버는 Native 실행 (dotnet watch run)
+  # 아래 주석을 해제하면 서버도 Docker로 실행 가능
   #
   # game-server:
   #   build:
@@ -36,11 +37,14 @@ services:
   #     dockerfile: Dockerfile
   #   container_name: castle-server-dev
   #   ports:
-  #     - "10010:8080"  # 외부 10010 → 컨테이너 내부 8080
+  #     - "${SERVER_PORT}:8080"  # .env.dev의 SERVER_PORT 사용
   #   environment:
-  #     ASPNETCORE_ENVIRONMENT: Development
-  #     ConnectionStrings__PostgreSQL: "Host=postgres;Port=5432;Database=castle_lord_tycoon;Username=gameuser;Password=dev_password_change_in_production"
+  #     ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+  #     ConnectionStrings__PostgreSQL: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
   #     ConnectionStrings__Redis: "redis:6379"
+  #     Jwt__SecretKey: ${JWT_SECRET_KEY}
+  #     Jwt__Issuer: ${JWT_ISSUER}
+  #     Jwt__Audience: ${JWT_AUDIENCE}
   #   depends_on:
   #     - postgres
   #     - redis
