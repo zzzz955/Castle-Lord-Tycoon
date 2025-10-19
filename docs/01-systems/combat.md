@@ -56,17 +56,35 @@ combat_initialization:
 ```
 
 ### 3. 라운드 진행
-```
+
+```yaml
+전투 스냅샷 생성:
+  - 서버가 현재 영웅 기본 스탯 조회
+  - 장비 보너스 적용하여 최종 스탯 계산
+    * Base Stats (HP, Attack, Defense)
+    * Extended Stats (crit_rate, crit_damage, evasion, etc.)
+    * Flat Bonuses: stat + equipment_flat_bonus
+    * Percent Bonuses: result × (1 + equipment_percent_bonus)
+  - 전투 전용 스냅샷 생성 (불변)
+  - 아군 버프/적군 디버프 적용 (Aura 고유 효과)
+
 각 라운드:
   1. 플레이어 선공 후 1턴씩 공격을 주고 받음
   2. 우선순위 순서대로 행동 (1→9)
   3. 각 유닛:
      - 생존 여부 체크 (전투 중 사망한 기물의 턴은 스킵, 스킵된 경우 상대방의 턴으로 넘어감)
      - 타겟 선택 (우선 공격 등 효과가 없을 경우 자신과 같은 행의 맨 앞 기물을 타겟으로 공격, 같은 행에 타겟이 없을 경우 위쪽 행 우선 타격, 위쪽 행에도 기물이 없을 경우 아래쪽 행 타격)
-     - 데미지 계산 (속성 상성 적용)
+     - 데미지 계산 (속성 상성 + 고유 효과 적용)
      - 데미지 적용
+     - 고유 효과 발동 (흡혈, 피해 감소, 반사 피해, 보호막 등)
   4. 양측 전멸 체크
   5. 라운드 증가
+
+스탯 검증:
+  - 서버 계산 스탯으로 전투 시뮬레이션 (Server Authoritative)
+  - 클라이언트 스탯은 UI 표시용
+  - 전투 시작 시 서버-클라이언트 스탯 불일치 검증
+  - 불일치 시 서버 값 사용 및 클라이언트 동기화
 ```
 
 ### 4. 전투 종료
@@ -108,17 +126,41 @@ disadvantage_table:
 
 ```yaml
 formula:
-  base_damage: "공격력 - 방어력 (최소 1)"
-  element_bonus: "±30% (속성 상성)"
-  final_damage: "기본 데미지 × (1 + 속성 보너스)"
+  step_1_armor_penetration: "방어력 × (1 - 방어도 무시)"
+  step_2_base_damage: "공격력 - 감소된 방어력 (최소 1)"
+  step_3_element_bonus: "±30% (속성 상성)"
+  step_4_crit_check: "크리티컬 판정"
+  step_5_evasion_check: "회피 판정 (회피 무시 고려)"
+  step_6_unique_effects: "고유 효과 적용"
+  step_7_final_damage: "최종 피해"
+
+detailed_calculation:
+  1. 방어력 감소: defense × (1 - armor_penetration)
+  2. 기본 피해: max(1, attack - reduced_defense)
+  3. 속성 보너스: base_damage × (1 + element_modifier)
+  4. 크리티컬:
+     - 확률: crit_rate
+     - 피해: damage × (1 + crit_damage)
+  5. 회피:
+     - 확률: evasion × (1 - evasion_pierce)
+     - 성공 시: damage = 0 (Miss)
+  6. 고유 효과:
+     - 추가 피해, 피해 증가 등
+  7. 최종 피해:
+     - 받는 피해 감소: damage × (1 - damage_reduction)
+     - 블록: damage × 0.5 (확률 판정)
 
 example:
-  attacker: "공격력 100, 불 속성"
-  defender: "방어력 30, 땅 속성"
+  attacker: "공격력 100, 불 속성, 방어도 무시 20%"
+  defender: "방어력 30, 땅 속성, 받는 피해 감소 10%"
   calculation:
-    base: "100 - 30 = 70"
-    element: "불 > 땅 = +30%"
-    final: "70 × 1.3 = 91"
+    step1: "30 × (1 - 0.2) = 24 (감소된 방어력)"
+    step2: "100 - 24 = 76"
+    step3: "76 × 1.3 = 98.8 (속성 보너스)"
+    step4: "크리티컬 미발동"
+    step5: "회피 실패"
+    step6: "고유 효과 없음"
+    step7: "98.8 × (1 - 0.1) = 88.92 (최종)"
 ```
 
 ## 보상 시스템
@@ -145,9 +187,23 @@ drop_system:
   rule: "생존 여부 무관"
   factors:
     - 몬스터 드랍 테이블
-    - 영웅 행운 스탯
-    - 장비 드랍률 옵션
+    - 파티 드랍률 합산 (drop_rate_bonus)
     - 계급 보너스
+
+party_bonus_calculation:
+  exp: "파티 전체 exp_bonus 합산"
+  gold: "파티 전체 gold_bonus 합산"
+  drop_rate: "파티 전체 drop_rate_bonus 합산"
+
+  example:
+    hero1: "exp +10%, gold +5%"
+    hero2: "exp +15%, drop +8%"
+    hero3: "gold +12%"
+    total: "exp +25%, gold +17%, drop +8%"
+
+  application:
+    base_exp: 100
+    final_exp: "100 × (1 + 0.25) = 125"
 ```
 
 ## 전투 결과 누적

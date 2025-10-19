@@ -738,6 +738,199 @@ if (castle.UserId != requestUserId) {
 
 ---
 
+### 5.4 Hero Stats Synchronization & Security
+
+**Server Authoritative Pattern**: 서버가 모든 스탯 계산의 최종 권한을 가짐
+
+#### Stat Calculation Flow
+```yaml
+stat_calculation:
+  server_authority:
+    - 모든 스탯 계산은 서버에서 수행
+    - 클라이언트 계산은 UI 표시 목적만
+    - 전투 시작 시 서버-클라이언트 스탯 검증 필수
+
+  calculation_pipeline:
+    1. Base Stats (base_hp, base_attack, base_defense)
+    2. + Flat Bonuses (equipment_flat_bonus)
+    3. × Percent Bonuses (1 + equipment_percent_bonus)
+    4. + Combat Modifiers (buffs/debuffs)
+    5. → Final ComputedStats
+
+  recalculation_triggers:
+    - 레벨업
+    - 장비 착용/해제
+    - 보석 부착/제거
+    - 전투 종료 후
+```
+
+#### Equipment Change Validation
+```csharp
+// Client: Optimistic UI Update
+public async Task EquipItem(Guid heroId, Guid equipmentId) {
+    // 즉시 UI 업데이트 (낙관적)
+    hero.EquippedWeapon = equipmentId;
+    UpdateHeroStatsUI(hero);
+
+    // 서버 검증 요청
+    var result = await apiClient.EquipItemAsync(heroId, equipmentId);
+
+    if (!result.Success) {
+        // 서버 검증 실패 시 롤백
+        hero.EquippedWeapon = previousEquipmentId;
+        UpdateHeroStatsUI(hero);
+        ShowError(result.Error);
+    }
+}
+
+// Server: Authority Validation
+[HttpPost("heroes/{heroId}/equipment")]
+public async Task<IActionResult> EquipItem(Guid heroId, EquipItemRequest request) {
+    var hero = await _heroService.GetHeroAsync(heroId, userId);
+    var equipment = await _equipmentService.GetEquipmentAsync(request.EquipmentId);
+
+    // 1. 권한 검증
+    if (hero.UserId != userId) return Unauthorized();
+
+    // 2. 장비 소유 검증
+    if (!await _equipmentService.IsOwnedByUser(request.EquipmentId, userId))
+        return BadRequest("EQUIPMENT_NOT_OWNED");
+
+    // 3. 장비 타입 검증
+    if (!IsValidEquipmentSlot(hero, equipment))
+        return BadRequest("INVALID_EQUIPMENT_SLOT");
+
+    // 4. 장비 착용 (Base Stats는 독립적)
+    hero.EquippedWeapon = request.EquipmentId;
+
+    // 5. Dirty flag 설정 (스탯 재계산 예약)
+    hero.MarkStatsAsDirty();
+
+    await _heroService.SaveAsync(hero);
+
+    // 6. 최신 스탯 반환 (검증용)
+    var computedStats = await _heroService.ComputeStatsAsync(heroId);
+
+    return Ok(new {
+        Success = true,
+        Data = new {
+            Hero = hero,
+            ComputedStats = computedStats
+        }
+    });
+}
+```
+
+#### Combat Start Validation
+```csharp
+// Client: 전투 시작 요청
+public async Task StartCombat(List<Guid> heroIds) {
+    var combatRequest = new CombatStartRequest {
+        PartyHeroIds = heroIds,
+        ClientStats = heroIds.Select(id => new {
+            HeroId = id,
+            HP = heroes[id].ComputedHP,
+            Attack = heroes[id].ComputedAttack,
+            Defense = heroes[id].ComputedDefense
+        }).ToList()
+    };
+
+    var result = await apiClient.StartCombatAsync(combatRequest);
+
+    if (result.StatsMismatch) {
+        // 서버 스탯과 불일치 → 클라이언트 동기화
+        await SyncHeroStatsFromServer(result.ServerStats);
+        ShowWarning("스탯이 동기화되었습니다");
+    }
+
+    StartCombatScene(result.CombatSnapshot);
+}
+
+// Server: 전투 시작 스탯 검증
+[HttpPost("combat/start")]
+public async Task<IActionResult> StartCombat(CombatStartRequest request) {
+    var serverStats = new List<HeroCombatSnapshot>();
+    var statsMismatch = false;
+
+    foreach (var heroId in request.PartyHeroIds) {
+        // 1. 서버에서 스탯 재계산 (최종 권한)
+        var hero = await _heroService.GetHeroAsync(heroId, userId);
+        var computedStats = await _heroService.ComputeStatsAsync(heroId);
+
+        // 2. 전투 스냅샷 생성 (불변)
+        var snapshot = new HeroCombatSnapshot {
+            HeroId = heroId,
+            MaxHp = computedStats.Hp,
+            CurrentHp = hero.CurrentHp,
+            Attack = computedStats.Attack,
+            Defense = computedStats.Defense,
+            CritRate = computedStats.CritRate,
+            CritDamage = computedStats.CritDamage,
+            Evasion = computedStats.Evasion,
+            ArmorPenetration = computedStats.ArmorPenetration,
+            EvasionPierce = computedStats.EvasionPierce,
+            UniqueEffects = await _heroService.GetUniqueEffectsAsync(heroId)
+        };
+
+        // 3. 클라이언트 스탯과 비교 (선택적)
+        var clientStat = request.ClientStats.FirstOrDefault(s => s.HeroId == heroId);
+        if (clientStat != null) {
+            if (Math.Abs(clientStat.Attack - snapshot.Attack) > 1 ||
+                Math.Abs(clientStat.Defense - snapshot.Defense) > 1) {
+                statsMismatch = true;
+            }
+        }
+
+        serverStats.Add(snapshot);
+    }
+
+    // 4. 전투 세션 생성
+    var combat = await _combatService.CreateCombatAsync(userId, serverStats);
+
+    return Ok(new {
+        Success = true,
+        Data = new {
+            CombatId = combat.Id,
+            CombatSnapshot = serverStats,
+            StatsMismatch = statsMismatch,
+            ServerStats = serverStats // 클라이언트 동기화용
+        }
+    });
+}
+```
+
+#### Security Measures
+```yaml
+anti_cheat:
+  memory_tampering_protection:
+    - 클라이언트 스탯 계산은 표시 목적만
+    - 서버가 모든 전투 시뮬레이션 수행
+    - 전투 결과는 서버에서만 계산
+
+  validation_checkpoints:
+    - 장비 착용/해제 시 서버 검증
+    - 전투 시작 시 스탯 일치 확인
+    - 전투 종료 후 결과 검증
+
+  rate_limiting:
+    - 스탯 조회: 100 req/min
+    - 장비 변경: 30 req/min
+    - 전투 시작: 10 req/min
+
+performance_optimization:
+  caching_strategy:
+    - Redis: 계산된 스탯 캐싱 (TTL: 5분)
+    - Dirty Flag: 스탯 변경 시에만 재계산
+    - Batch Query: 파티 전체 스탯 한번에 조회
+
+  optimistic_ui:
+    - 장비 변경 즉시 UI 업데이트
+    - 서버 응답 대기 중 로딩 표시 없음
+    - 검증 실패 시 롤백 및 에러 표시
+```
+
+---
+
 ## 6. Rate Limiting
 
 ### 6.1 Rate Limit Rules
