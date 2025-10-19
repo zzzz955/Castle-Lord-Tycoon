@@ -1,0 +1,6 @@
+@CastleLordTycoon.Server_HostAddress = http://localhost:5194
+
+GET {{CastleLordTycoon.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
