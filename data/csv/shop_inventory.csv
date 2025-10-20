@@ -1,0 +1,5 @@
+﻿shop_id,item_id,item_type,currency_type,price,stock_type,stock_value,unlock_rank
+town_basic,minor_hp_potion,consumable,gold,120,per_day,5,castellan
+town_basic,flag_s,item,gold,250,per_week,1,castellan
+fortress_elite,oak_longbow,weapon,gold,480,per_rotation,1,baron
+fortress_elite,rare_crafting_core,material,token,12,per_rotation,2,count

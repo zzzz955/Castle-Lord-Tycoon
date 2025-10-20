@@ -1,0 +1,5 @@
+﻿monster_id,display_name_ko,display_name_en,biome_tag,level,base_hp,base_attack,base_defense,base_speed,behavior_profile,reward_id
+slime_basic,초록슬라임,Green Slime,grasslands,1,600,70,40,60,melee_basic,reward_slime_t1
+wolf_alpha,평원늑대,Plain Wolf,grasslands,3,950,110,65,105,melee_fast,reward_wolf_t1
+brigand_raider,산적습격자,Brigand Raider,frontier,4,1200,135,85,95,human_mix,reward_brigand_t1
+golem_warder,폐광골렘,Abandoned Golem,ruins,6,2200,160,150,70,boss_guardian,reward_golem_boss

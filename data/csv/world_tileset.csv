@@ -1,0 +1,6 @@
+﻿tile_id,biome_tag,grid_x,grid_y,travel_cost,has_settlement,encounter_table_id
+tile_0000,grasslands,0,0,1.0,true,town_haven
+tile_0001,grasslands,1,0,1.0,false,grasslands
+tile_0100,grasslands,0,1,1.0,false,grasslands
+tile_0202,frontier,2,2,1.1,false,frontier
+tile_0303,ruins,3,3,1.3,true,fortress_ashfall

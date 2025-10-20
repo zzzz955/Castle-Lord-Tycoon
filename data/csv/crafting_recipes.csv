@@ -1,0 +1,3 @@
+﻿recipe_id,facility_id,output_item,output_amount,cost_gold,craft_time_seconds,materials,unlock_rank
+weapon_refine_01,blacksmith_lv1,oak_longbow,1,260,1800,"oak_wood:6|wolf_pelt:3",baron
+potion_bundle_01,apothecary_lv1,minor_hp_potion,3,80,900,"herb_leaf:5|pure_water:2",castellan

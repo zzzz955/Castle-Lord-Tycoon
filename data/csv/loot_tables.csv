@@ -1,0 +1,7 @@
+﻿drop_pool_id,item_id,weight,min_quantity,max_quantity
+drop_pool_grasslands_common,minor_hp_potion,50,1,2
+drop_pool_grasslands_common,oak_longbow,10,1,1
+drop_pool_grasslands_uncommon,flag_s,15,1,1
+drop_pool_frontier_rare,rare_crafting_core,8,1,1
+drop_pool_ruins_boss,legendary_shard,5,1,1
+drop_pool_ruins_boss,oak_longbow,12,1,1

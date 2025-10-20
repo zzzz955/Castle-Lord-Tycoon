@@ -1,0 +1,7 @@
+﻿service_id,service_type,cost_type,cost_value,effect
+rest_basic,rest,gold,0,full_heal_party
+shop_basic,shop,none,0,open_shop_ui
+party_management,management,none,0,open_party_ui
+blacksmith_lv1,crafting,gold,0,craft_weapon_t1
+apothecary_lv1,crafting,gold,0,craft_potions_t1
+elite_shop,shop,token,0,access_elite_inventory

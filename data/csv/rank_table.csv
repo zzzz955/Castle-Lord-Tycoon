@@ -1,0 +1,5 @@
+﻿rank_id,display_name_ko,display_name_en,required_area,required_towns,required_fortresses,exp_bonus_pct,drop_bonus_pct,movement_bonus_pct,decay_rate_pct
+castellan,성주,Castellan,0,0,0,0,0,0,0
+baron,남작,Baron,6,1,0,5,3,2,3
+count,백작,Count,12,2,0,8,5,4,5
+marquis,후작,Marquis,18,2,1,10,7,6,7

@@ -1,0 +1,4 @@
+﻿flag_id,display_name_ko,display_name_en,size_tiles,cost_gold,upkeep_gold,rank_required,unlock_condition
+flag_s,정찰깃발,Scout Banner,3,250,0,castellan,default
+flag_m,경비깃발,Outpost Banner,5,600,20,baron,complete_camp_quest
+flag_l,요새깃발,Fortress Banner,7,1200,50,count,fortress_clear_01

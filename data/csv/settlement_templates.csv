@@ -1,0 +1,3 @@
+﻿settlement_id,display_name_ko,display_name_en,type,associated_tile,services,unlock_condition
+town_haven,헤이븐마을,Haven Town,town,tile_0000,"rest|shop_basic|party",auto_claim
+fortress_ashfall,잿더미요새,Ashfall Fortress,fortress,tile_0303,"blacksmith_lv1|apothecary_lv1|elite_shop",requires_flag_chain

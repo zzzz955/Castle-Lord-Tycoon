@@ -1,0 +1,5 @@
+﻿reward_id,gold_min,gold_max,exp_min,exp_max,drop_pool_id,bonus_notes
+reward_slime_t1,40,65,70,95,drop_pool_grasslands_common,
+reward_wolf_t1,65,110,110,150,drop_pool_grasslands_uncommon,
+reward_brigand_t1,95,150,160,210,drop_pool_frontier_rare,
+reward_golem_boss,220,280,320,380,drop_pool_ruins_boss,first_clear_materia

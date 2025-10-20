@@ -1,0 +1,5 @@
+﻿effect_id,effect_type,target,trigger,stat,modifier_type,modifier_value,duration_turns,max_stacks
+buff_guardian_wall,buff,self,on_battle_start,defense,percent,20,3,1
+buff_ranger_focus,buff,self,on_turn_start,attack,percent,15,2,3
+debuff_wolf_bleed,debuff,target,on_hit,hp,damage_over_time,35,2,3
+buff_priest_grace,buff,ally,on_heal,hp,flat,120,1,1

@@ -1,0 +1,5 @@
+﻿affix_id,category,stat,grade_min,grade_max,min_value,max_value,value_type,tags
+affix_atk_flat,offense,attack,c,l,12,42,flat,core
+affix_hp_flat,defense,hp,c,l,90,260,flat,core
+affix_crit_rate,offense,crit_rate,r,l,2,8,percent,advanced
+affix_resist,defense,status_resist,uc,h,5,15,percent,utility

@@ -1,0 +1,5 @@
+﻿equipment_id,slot_id,level_band_id,grade_id,display_name_ko,display_name_en,base_stat_id,base_stat_value,affix_pool_ids,tags
+saber_bronze,weapon,lv_01_10,c,청동장검,Bronze Sabre,attack,120,"affix_atk_flat",starter
+longbow_oak,weapon,lv_01_10,uc,오크롱보우,Oak Longbow,attack,160,"affix_atk_flat|affix_crit_rate",drop_grasslands
+armor_scout,armor,lv_01_10,c,스카우트코트,Scout Coat,defense,90,"affix_hp_flat",starter
+ring_swift,ring,lv_01_10,r,신속의반지,Ring of Swiftness,attack,95,"affix_crit_rate|affix_resist",drop_ruins

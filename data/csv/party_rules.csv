@@ -1,0 +1,3 @@
+﻿rule_id,max_party_size,unlock_rank,notes
+default,4,castellan,Base party slots
+rank_bonus_marquis,5,marquis,Unlocked via rank promotion

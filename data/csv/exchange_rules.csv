@@ -1,0 +1,3 @@
+﻿exchange_id,input_currency,input_amount,output_item,output_amount,limit_type,limit_value,unlock_rank
+token_to_flag_s,exchange_token,5,flag_s,1,daily,1,baron
+ore_to_core,iron_ore,20,rare_crafting_core,1,weekly,2,count

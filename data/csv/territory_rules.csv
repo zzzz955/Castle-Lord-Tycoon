@@ -1,0 +1,2 @@
+﻿rule_id,diagonal_allowed,max_chain_length,reclaim_refund_pct,decay_enabled,decay_interval_hours
+mvp_default,false,12,80,true,168

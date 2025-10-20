@@ -1,0 +1,8 @@
+﻿biome_tag,danger_level,encounter_id,encounter_type,weight
+grasslands,1,encounter_slime_pack,battle,60
+grasslands,1,encounter_wolf_pair,battle,30
+grasslands,1,encounter_abandoned_cache,event,10
+frontier,2,encounter_brigand_patrol,battle,55
+frontier,2,encounter_lost_trader,event,15
+ruins,3,encounter_golem_guardian,battle,40
+ruins,3,encounter_relic_cache,event,15

@@ -1,0 +1,6 @@
+﻿slot_id,display_name_ko,display_name_en,max_per_hero,exclusive_roles,icon_asset
+weapon,무기,Weapon,1,,ui/icon_slot_weapon.png
+armor,갑옷,Armor,1,,ui/icon_slot_armor.png
+necklace,목걸이,Necklace,1,,ui/icon_slot_necklace.png
+ring,반지,Ring,2,,ui/icon_slot_ring.png
+belt,허리띠,Belt,1,,ui/icon_slot_belt.png
