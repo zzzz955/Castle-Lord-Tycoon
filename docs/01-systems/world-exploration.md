@@ -84,7 +84,7 @@ owned_territory:
 ```yaml
 exploration:
   method: "캐릭터 이동"
-  range: "캐릭터 중심 반경 N 타일"
+  range: "캐릭터 중심 반경 5 타일"
   permanent: true  # 한 번 탐험하면 유지
 
 visibility_range:
@@ -107,7 +107,7 @@ camping:
 
   effect:
     - HP 서서히 회복
-    - 회복량: "시간당 최대 HP의 N%"
+    - 회복량: "5초당 최대 HP의 10%"
     - 조우 발생 없음
 
   cancel:
