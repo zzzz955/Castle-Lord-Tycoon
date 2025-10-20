@@ -253,6 +253,116 @@ promotion_notification:
 - 드랍률 증가
 - 각종 효율 보너스
 
+## 경제 밸런싱
+
+### 골드 획득 vs 소비
+
+```yaml
+gold_sources:
+  monster_drops:
+    formula: "(monster_level × 5) × (1 + growth_rate/100)"
+    examples:
+      lv5_slime_growth20: "30 gold"
+      lv10_wolf_growth30: "65 gold"
+      lv15_boss_growth60: "120 gold"
+
+  rank_bonus:
+    apply: "gold_bonus from rank benefits"
+    examples:
+      baron: "+2%"
+      earl: "+10%"
+      emperor: "+50%"
+
+  hero_bonus:
+    apply: "party gold_bonus sum"
+    example: "hero1 +5% + hero2 +12% = +17%"
+
+gold_sinks:
+  flag_placement:
+    3x3: 100
+    5x5: 500
+    7x7: 2000
+    note: "영토 확장의 주요 골드 소비처"
+
+  hero_recruitment:
+    gacha_cost: "300~1000 gold/pull"
+    rate_up: "이벤트 시 할인"
+    note: "영웅 수집의 주요 골드 소비처"
+
+  equipment_purchase:
+    town_shop: "level × grade_multiplier"
+    fortress_shop: "premium items"
+
+balancing_target:
+  early_game:
+    lv1_10: "깃발 3x3 위주, 영웅 1~2회 모집"
+    income: "전투당 평균 50 gold"
+    expense: "깃발 2~3개 (300 gold), 가챠 1회 (500 gold)"
+
+  mid_game:
+    lv11_50: "깃발 5x5 주력, 영웅 수집 가속"
+    income: "전투당 평균 200 gold"
+    expense: "깃발 5~10개 (2500~5000 gold), 가챠 5~10회"
+
+  late_game:
+    lv51_200: "깃발 7x7 필수, 고성능 영웅 수집"
+    income: "전투당 평균 800 gold"
+    expense: "깃발 10~20개 (20000~40000 gold), 가챠 20회+"
+```
+
+### 경험치 밸런싱
+
+```yaml
+exp_sources:
+  monster_drops:
+    formula: "(monster_level × 10) × (1 + growth_rate/100)"
+    분배: "생존자 균등 분배"
+    examples:
+      lv5_slime_growth20:
+        total: "60 exp"
+        party_4_all_alive: "15 exp/hero"
+        party_4_two_alive: "30 exp/hero"
+
+  rank_bonus:
+    apply: "exp_bonus from rank benefits"
+    examples:
+      castellan: "+0%"
+      earl: "+20%"
+      emperor: "+100%"
+
+  hero_bonus:
+    apply: "party exp_bonus sum"
+    example: "hero1 +10% + hero2 +15% = +25%"
+
+leveling_curve_validation:
+  target: "캐주얼 플레이 기준 레벨 100 도달 시간"
+
+  assumptions:
+    daily_playtime: "1~2시간"
+    battles_per_hour: "10~15 전투"
+    average_exp_per_battle: "파티 생존자 기준 50~200 exp"
+
+  early_game_lv1_20:
+    exp_required: "누적 약 10000 exp"
+    battles_needed: "100~200 전투"
+    estimated_time: "7~10 시간"
+
+  mid_game_lv21_50:
+    exp_required: "누적 약 100000 exp"
+    battles_needed: "500~1000 전투"
+    estimated_time: "50~100 시간"
+
+  late_game_lv51_100:
+    exp_required: "누적 약 1000000 exp"
+    battles_needed: "3000~5000 전투"
+    estimated_time: "300~500 시간"
+
+  balancing_note:
+    - "계급 보너스로 후반 가속"
+    - "파티 보너스 영웅으로 효율 증가"
+    - "요새 클리어 보상으로 점프 가능"
+```
+
 ## 밸런스 파라미터
 
 ```yaml
@@ -265,6 +375,11 @@ benefit_scaling:
   linear: ["exp_bonus", "drop_rate"]
   exponential: ["rare_drop_weight"]
   threshold: ["special_tokens"]
+
+economy_balance:
+  gold_income_vs_expense: "1:1.2 비율 (약간의 부족)"
+  gacha_frequency: "하루 1~2회 (적극적 플레이 시)"
+  flag_expansion: "계급당 5~10개"
 ```
 
 ## 확장 가능성

@@ -322,25 +322,220 @@ aura_stacking:
   example: "Hero1 공격+10% + Hero2 공격+8% = 총 +18%"
 ```
 
-## 레벨 시스템
+## 성장 시스템
 
-### 경험치 곡선
+### 영웅 등급 (Star Grade)
 
 ```yaml
-exp_formula:
-  formula: "100 × level^1.5"
+star_grades:
+  1star:
+    grade: "★☆☆☆☆☆"
+    growth_rate: 11
+    rarity: "매우 흔함"
+    unique_effect: false
 
-examples:
-  Lv1→2: 100
-  Lv2→3: 282
-  Lv3→4: 519
+  2star:
+    grade: "★★☆☆☆☆"
+    growth_rate: 23
+    rarity: "흔함"
+    unique_effect: false
+
+  3star:
+    grade: "★★★☆☆☆"
+    growth_rate: 34
+    rarity: "보통"
+    unique_effect: false
+
+  4star:
+    grade: "★★★★☆☆"
+    growth_rate: 44
+    rarity: "희귀"
+    unique_effect: true
+
+  5star:
+    grade: "★★★★★☆"
+    growth_rate: 53
+    rarity: "매우 희귀"
+    unique_effect: true
+
+  6star:
+    grade: "★★★★★★"
+    growth_rate: 61
+    rarity: "전설"
+    unique_effect: true
+    visual: "첫 번째 별이 빨간색"
+
+note: "영웅 등급은 획득 시 고정, 성장치는 환생 시스템으로만 추가 증가"
 ```
 
-### 레벨 상한
+### 영웅 타입별 기본 스탯
 
 ```yaml
-level_cap:
-  initial: 200
+hero_types:
+  offensive:
+    name: "공격형"
+    stat_focus: "공격력 비중 높음, 방어력 비중 낮음"
+    base_stats_lv1:
+      hp: 100  # 모든 타입 동일
+      attack:
+        1star: 12
+        2star: 15
+        3star: 18
+        4star: 22
+        5star: 26
+        6star: 30
+      defense:
+        1star: 3
+        2star: 4
+        3star: 5
+        4star: 6
+        5star: 7
+        6star: 8
+
+  defensive:
+    name: "방어형"
+    stat_focus: "방어력 비중 높음, 공격력 비중 낮음"
+    base_stats_lv1:
+      hp: 100
+      attack:
+        1star: 8
+        2star: 10
+        3star: 12
+        4star: 14
+        5star: 17
+        6star: 20
+      defense:
+        1star: 7
+        2star: 9
+        3star: 11
+        4star: 14
+        5star: 17
+        6star: 20
+
+  balanced:
+    name: "균등형"
+    stat_focus: "공격력 살짝 높음, 방어력 살짝 낮음"
+    base_stats_lv1:
+      hp: 100
+      attack:
+        1star: 10
+        2star: 13
+        3star: 15
+        4star: 18
+        5star: 22
+        6star: 25
+      defense:
+        1star: 5
+        2star: 6
+        3star: 8
+        4star: 10
+        5star: 12
+        6star: 14
+
+balance_note: "라운드가 10라운드 이내로 종료되도록 밸런싱"
+```
+
+### 레벨업 시스템
+
+```yaml
+max_level: 200
+
+exp_formula:
+  rule: "레벨 뒷자리 기준"
+  calculation:
+    level_x0_to_x8: "이전 레벨 필요 경험치 × 1.2"
+    level_x9: "이전 레벨 필요 경험치 × 1.5"
+
+  examples:
+    lv1_to_lv2: 100
+    lv2_to_lv3: 120    # 100 × 1.2
+    lv3_to_lv4: 144    # 120 × 1.2
+    lv8_to_lv9: 358    # 299 × 1.2
+    lv9_to_lv10: 537   # 358 × 1.5
+    lv10_to_lv11: 644  # 537 × 1.2
+    lv19_to_lv20: 2322 # 1548 × 1.5
+    lv29_to_lv30: 8380 # 5587 × 1.5
+
+stat_growth_formula:
+  hp_per_level: "20 × ((100 + growth_rate) / 100)"
+  attack_per_level: "base_attack × ((100 + growth_rate) / 100) × type_multiplier"
+  defense_per_level: "base_defense × ((100 + growth_rate) / 100) × type_multiplier"
+
+  type_multipliers:
+    offensive:
+      attack: 0.12  # 공격 12% 증가/레벨
+      defense: 0.05 # 방어 5% 증가/레벨
+    defensive:
+      attack: 0.05  # 공격 5% 증가/레벨
+      defense: 0.12 # 방어 12% 증가/레벨
+    balanced:
+      attack: 0.09  # 공격 9% 증가/레벨
+      defense: 0.08 # 방어 8% 증가/레벨
+
+  examples:
+    6star_offensive_lv1:
+      growth_rate: 61
+      hp: 100
+      attack: 30
+      defense: 8
+
+    6star_offensive_lv2:
+      hp: "100 + 20 × 1.61 = 132"
+      attack: "30 + 30 × 1.61 × 0.12 = 36"
+      defense: "8 + 8 × 1.61 × 0.05 = 9"
+
+    6star_offensive_lv100:
+      hp: "100 + (20 × 1.61 × 99) = 3287"
+      attack: "30 + (30 × 1.61 × 0.12 × 99) = 606"
+      defense: "8 + (8 × 1.61 × 0.05 × 99) = 72"
+
+exp_sources:
+  - 전투 승리 (생존자 균등 분배)
+  - 계급 보너스 적용
+
+level_up_effects:
+  - HP/공격/방어 자동 증가
+  - 새로운 장비 착용 가능
+  - 전투력 재계산
+```
+
+### 환생 시스템 (Rebirth)
+
+```yaml
+concept: "동일 영웅 합성으로 성장치 강화"
+
+requirements:
+  - 동일한 영웅 2개 필요 (이름 + 등급 일치)
+  - 베이스 영웅 + 제물 영웅
+
+rebirth_bonus:
+  formula: "제물 영웅 레벨에 비례하여 성장치 증가"
+  growth_rate_bonus: "sacrifice_level × 0.05"
+
+  examples:
+    base_hero: "6성 전사 (성장치 61)"
+    sacrifice_lv50: "6성 전사 Lv50"
+    new_growth_rate: "61 + (50 × 0.05) = 63.5"
+    result: "성장치 63.5로 영구 강화"
+
+    sacrifice_lv100: "6성 전사 Lv100"
+    new_growth_rate: "61 + (100 × 0.05) = 66"
+    result: "성장치 66으로 영구 강화"
+
+stacking:
+  unlimited: true
+  note: "환생 횟수 제한 없음, 성장치는 계속 증가 가능"
+
+effects:
+  - 베이스 영웅 레벨 유지
+  - 기존 장비 유지
+  - 성장치만 영구 증가
+  - 이후 레벨업 시 더 높은 스탯 획득
+  - 제물 영웅은 소멸
+
+ui_display:
+  - 환생 횟수 표시 (예: "환생 +3")
+  - 강화된 성장치 표시 (예: "성장치: 66 (+5)")
 ```
 
 ## 파티 편성

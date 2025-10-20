@@ -15,7 +15,7 @@ round_limit: 10
 
 ## 그리드 시스템
 
-### 3×3 배치
+### 일반 전투: 3×3 배치
 ```
 [7] [4] [1]   우측 상단(1) → 우측 중단(2) → 우측 하단(3)
 [8] [5] [2]   중앙 상단(4) → 중앙 중단(5) → 중앙 하단(6)
@@ -30,6 +30,22 @@ placement_rules:
   - 빈 칸 허용
   - 배치 순서가 전략의 핵심
   - 적도 동일한 규칙 적용, 단 UI상 플레이어와 좌우 반전되어 보임
+```
+
+### 요새 보스 전투: 3×3 배치 (6인)
+```
+concept: "요새 보스 전투는 최대 6명까지 배치 가능"
+
+placement_rules:
+  - 일반 전투: 최대 4명
+  - 요새 보스: 최대 6명
+  - 그리드 크기는 동일 (3×3)
+  - 배치 전략이 더 중요해짐
+
+strategic_advantage:
+  - 더 많은 영웅으로 화력 집중
+  - 다양한 고유 효과 조합
+  - 속성 시너지 극대화
 ```
 
 ### 전략적 배치
@@ -304,14 +320,199 @@ exp_scaling:
   party_penalty: false  # 분배만, 총량 감소 없음
 ```
 
+## 고유 효과 트리거 시스템
+
+### 트리거 타입
+
+```yaml
+trigger_types:
+  COMBAT_START:
+    name: "전투 시작 시"
+    timing: "전투 스냅샷 생성 직후, 1회만"
+    duration_check: "round == 1"
+    examples:
+      - "보호막 생성"
+      - "전투 시작 버프"
+
+  ROUND_START:
+    name: "매 라운드 시작 시"
+    timing: "라운드 카운터 증가 직후"
+    duration_check: "매 라운드마다"
+    examples:
+      - "HP 회복"
+      - "스택 증가 (공격력/방어력)"
+      - "라운드별 버프"
+
+  MY_TURN:
+    name: "나의 턴 마다"
+    timing: "자신의 행동 순서 직전"
+    duration_check: "자신의 턴마다"
+    examples:
+      - "턴 시작 시 버프"
+      - "선제 효과"
+
+  FIRST_ATTACK:
+    name: "첫 공격 시"
+    timing: "전투 중 최초 1회 공격 시"
+    duration_check: "attack_count == 1"
+    examples:
+      - "첫 타격 보너스"
+      - "선공 강화"
+
+  ON_ATTACK:
+    name: "공격 시"
+    timing: "데미지 계산 직전"
+    duration_check: "매 공격마다"
+    examples:
+      - "추가 데미지"
+      - "확률 전열/전행 공격"
+      - "연속 공격"
+
+  ON_HIT:
+    name: "공격 적중 시"
+    timing: "데미지 적용 직후 (회피 미발동)"
+    duration_check: "적중 시마다"
+    examples:
+      - "흡혈"
+      - "디버프 부여"
+
+  ON_CRIT:
+    name: "크리티컬 발동 시"
+    timing: "크리티컬 판정 성공 시"
+    duration_check: "크리티컬마다"
+    examples:
+      - "치명타 증폭"
+      - "추가 효과"
+
+  ON_DAMAGED:
+    name: "피격 시"
+    timing: "피해를 받은 직후"
+    duration_check: "피해 받을 때마다"
+    examples:
+      - "반사 피해"
+      - "방어 버프"
+
+  ON_EVADE:
+    name: "회피 성공 시"
+    timing: "회피 판정 성공 시"
+    duration_check: "회피 성공마다"
+    examples:
+      - "회피 카운터"
+      - "버프 획득"
+
+  ON_KILL:
+    name: "적 처치 시"
+    timing: "적 HP가 0 이하가 된 직후"
+    duration_check: "처치 시마다"
+    examples:
+      - "영혼 흡수 (HP 회복)"
+      - "처치 버프"
+
+  ALLY_DAMAGED:
+    name: "아군 피격 시"
+    timing: "아군이 피해를 받은 직후"
+    duration_check: "아군 피해마다"
+    examples:
+      - "보호 버프"
+      - "분노 스택"
+
+  ALLY_DEAD:
+    name: "아군 사망 시"
+    timing: "아군 HP가 0 이하가 된 직후"
+    duration_check: "아군 사망마다"
+    examples:
+      - "복수 버프"
+      - "광폭화"
+
+  ON_DEATH:
+    name: "사망 시"
+    timing: "자신의 HP가 0 이하가 된 직후"
+    duration_check: "사망 시 1회"
+    examples:
+      - "부활"
+      - "최후의 일격"
+
+  ALWAYS:
+    name: "항상"
+    timing: "전투 중 지속"
+    duration_check: "전투 내내"
+    examples:
+      - "파티 보너스"
+      - "패시브 스탯 증가"
+```
+
+### 효과 지속 시간 관리
+
+```yaml
+duration_types:
+  permanent:
+    value: -1
+    desc: "전투 종료까지 지속"
+    examples:
+      - "ALWAYS 트리거 효과"
+      - "COMBAT_START 버프"
+
+  rounds:
+    value: N
+    desc: "N라운드 동안 지속"
+    examples:
+      - "디버프 (3라운드)"
+      - "임시 버프 (5라운드)"
+
+    management:
+      apply: "효과 발동 시 duration = N"
+      round_end: "라운드 종료 시 duration -= 1"
+      remove: "duration == 0이면 제거"
+
+  stacking:
+    type: "스택형"
+    max_stacks: "효과별로 정의"
+    examples:
+      - "생존 보너스 (5라운드마다 +N%, 무제한)"
+      - "광기 (매 라운드 +8%, 최대 5스택)"
+
+    management:
+      trigger: "ROUND_START 등"
+      condition: "stack_count < max_stacks"
+      action: "stack_count += 1, value = base_value × stack_count"
+
+  conditional:
+    type: "조건부"
+    duration: "조건 충족 시에만"
+    examples:
+      - "HP 30% 이하일 때"
+      - "라운드 5 이상일 때"
+```
+
+### 트리거 우선순위
+
+```yaml
+priority_order:
+  1: "COMBAT_START"
+  2: "ROUND_START"
+  3: "MY_TURN"
+  4: "FIRST_ATTACK / ON_ATTACK"
+  5: "ON_HIT / ON_CRIT"
+  6: "ON_DAMAGED / ON_EVADE"
+  7: "ON_KILL"
+  8: "ALLY_DAMAGED / ALLY_DEAD"
+  9: "ON_DEATH"
+  10: "ALWAYS (지속 적용)"
+
+execution_rule:
+  - 동일 타이밍 트리거는 영웅 순서대로 (1→9)
+  - 적 트리거는 아군 트리거 이후
+  - 효과 중첩 시 순차 적용
+```
+
 ## 확장 가능성
 
 ```yaml
 future_features:
-  - 스킬 시스템 (패시브만)
-  - 상태 효과 (화상, 빙결 등)
+  - 상태 효과 (화상, 빙결, 독 등)
   - 포지션 특화 (전열, 후열 보너스)
-  - 콤보 시스템
+  - 콤보 시스템 (특정 조합 시 추가 효과)
+  - 환경 효과 (날씨, 지형)
 ```
 
 ## 구현 체크리스트

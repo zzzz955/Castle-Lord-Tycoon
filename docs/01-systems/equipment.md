@@ -103,45 +103,91 @@ belt:
 ### 기본 능력치
 
 ```yaml
-weapon: "공격력 +N"
-armor: "방어력 +N"
-neckless: "HP +N"
-ring: "critical_rate +N%"
-belt: "block_rate +N%"
+weapon: "공격력 +N (Flat)"
+armor: "방어력 +N (Flat)"
+neckless: "HP +N (Flat)"
+ring: "critical_rate +N% (Percent)"
+belt: "evasion +N% (Percent)"  # block_rate → evasion 변경
 ```
 
-### 추가 옵션
+### 장비 수식어 시스템 (Prefix/Suffix)
+
+```yaml
+concept: "등급별로 수식어가 장비 이름에 붙어 옵션 표시"
+
+prefix_examples:
+  flat_bonuses:
+    - "맹공의" → attack +N (Flat)
+    - "견고한" → defense +N (Flat)
+    - "생명의" → hp +N (Flat)
+    - "날카로운" → armor_penetration +N (Flat)
+
+  percent_bonuses:
+    - "강력한" → attack +N% (Percent)
+    - "튼튼한" → defense +N% (Percent)
+    - "치명적인" → crit_rate +N% (Percent)
+    - "신속한" → evasion_pierce +N% (Percent)
+    - "파괴의" → crit_damage +N% (Percent)
+
+suffix_examples:
+  utility:
+    - "행운" → drop_rate +N% (Percent)
+    - "번영" → gold_bonus +N% (Percent)
+    - "성장" → exp_bonus +N% (Percent)
+
+naming_pattern:
+  C: "빛나는 검"
+  UC: "빛나는 검 of 행운"
+  R: "강력한 빛나는 검 of 행운"
+  H: "강력한 빛나는 검 of 행운"
+  L: "강력한 빛나는 검 of 행운"
+
+note: "수식어 개수는 등급에 따라 결정, 수식어 목록은 확장 가능"
+```
+
+### 추가 옵션 (Flat vs Percent 명시)
 
 ```yaml
 offensive:
-  - "추가 공격 +N"
-  - "데미지 +N%"
-  - "치명타 확률 +N%"
-  - "치명타 데미지 +N%"
-  - "속성 피해 +N%"
+  flat:
+    - "추가 공격 +N (attack)"
+    - "방어도 무시 +N (armor_penetration)"
+
+  percent:
+    - "공격력 +N% (attack)"
+    - "치명타 확률 +N% (crit_rate)"
+    - "치명타 데미지 +N% (crit_damage)"
+    - "회피 무시 +N% (evasion_pierce)"
 
 defensive:
-  - "추가 방어 +N"
-  - "피해 감소 +N%"
-  - "치명타 피해 감소 +N%"
-  - "회피 확률 +N%"
-  - "HP +N"
+  flat:
+    - "추가 방어 +N (defense)"
+    - "추가 HP +N (hp)"
+
+  percent:
+    - "방어력 +N% (defense)"
+    - "회피 확률 +N% (evasion)"
 
 utility:
-  - "드랍률 +N%"
-  - "경험치 +N%"
-  - "골드 획득 +N%"
+  percent:
+    - "드랍률 +N% (drop_rate_bonus)"
+    - "경험치 +N% (exp_bonus)"
+    - "골드 획득 +N% (gold_bonus)"
+
+note: "HP는 Flat만 존재, Percent로 증가시키지 않음"
 ```
 
-### 등급별 옵션 수
+### 등급별 수식어 수
 
 ```yaml
-options_by_grade:
-  C: 0-1개
-  UC: 0-1개
-  R: 1-2개
-  H: 2개 확정
-  L: 2개 확정, 높은 수치
+modifiers_by_grade:
+  C: 0개 (수식어 없음)
+  UC: 1개 (Prefix or Suffix)
+  R: 2개 (Prefix + Suffix)
+  H: 2개 (Prefix + Suffix, 높은 수치)
+  L: 2개 (Prefix + Suffix, 최고 수치)
+
+note: "장비 레벨은 기본 스탯에만 영향, 수식어는 등급에만 영향"
 ```
 
 ## 레벨 밴드
@@ -279,24 +325,144 @@ interaction:
 
 ## 밸런스 파라미터
 
+### 장비 기본 스탯 공식
+
 ```yaml
-stat_scaling:
+concept: "장비 레벨과 등급에 따른 기본 스탯 계산"
+
+formula:
+  base_stat: "(equipment_level × grade_multiplier) + grade_base"
+
+grade_multipliers:
+  C:
+    multiplier: 0.8
+    base: 5
+  UC:
+    multiplier: 1.0
+    base: 8
+  R:
+    multiplier: 1.3
+    base: 12
+  H:
+    multiplier: 1.7
+    base: 18
+  L:
+    multiplier: 2.2
+    base: 25
+
+examples:
   weapon_attack:
-    C_lv1: 5
-    C_lv50: 50
-    L_lv1: 15
-    L_lv50: 200
+    C_lv1: "(1 × 0.8) + 5 = 6"
+    C_lv50: "(50 × 0.8) + 5 = 45"
+    R_lv1: "(1 × 1.3) + 12 = 13"
+    R_lv50: "(50 × 1.3) + 12 = 77"
+    L_lv1: "(1 × 2.2) + 25 = 27"
+    L_lv50: "(50 × 2.2) + 25 = 135"
+    L_lv100: "(100 × 2.2) + 25 = 245"
 
-option_values:
-  drop_rate:
-    R: "3-5%"
-    H: "5-10%"
-    L: "10-20%"
+  armor_defense:
+    C_lv10: "(10 × 0.8) + 5 = 13"
+    R_lv20: "(20 × 1.3) + 12 = 38"
+    L_lv50: "(50 × 2.2) + 25 = 135"
 
-  bonus_attack:
-    R: "5-10"
-    H: "10-20"
-    L: "20-40"
+  neckless_hp:
+    C_lv1: "(1 × 0.8) + 5 = 6 → HP +60"
+    R_lv30: "(30 × 1.3) + 12 = 51 → HP +510"
+    L_lv70: "(70 × 2.2) + 25 = 179 → HP +1790"
+
+note: "HP 장비는 계산값 × 10"
+```
+
+### 수식어 옵션 값 범위
+
+```yaml
+concept: "수식어 값은 기본 스탯의 50% 평균, ±25% 범위"
+
+formula:
+  average_value: "base_stat × 0.5"
+  min_value: "average_value × 0.75"
+  max_value: "average_value × 1.25"
+  variance: "±25%"
+
+examples:
+  강력한_검_R_lv30:
+    base_attack: "(30 × 1.3) + 12 = 51"
+    average_bonus: "51 × 0.5 = 25.5"
+    min_bonus: "25.5 × 0.75 = 19"
+    max_bonus: "25.5 × 1.25 = 32"
+    result: "공격력 +19~32%"
+
+  맹공의_검_L_lv50:
+    base_attack: "(50 × 2.2) + 25 = 135"
+    average_bonus: "135 × 0.5 = 67.5"
+    min_bonus: "67.5 × 0.75 = 51"
+    max_bonus: "67.5 × 1.25 = 84"
+    result: "공격력 +51~84 (Flat)"
+
+  행운의_반지_H_lv40:
+    base_crit: "기본 10%"
+    average_bonus: "10 × 0.5 = 5%"
+    min_bonus: "5 × 0.75 = 3.75%"
+    max_bonus: "5 × 1.25 = 6.25%"
+    result: "드랍률 +3.75~6.25%"
+```
+
+### 등급별 수식어 값 보정
+
+```yaml
+grade_bonus_multiplier:
+  C: 1.0  # 수식어 없음
+  UC: 1.0
+  R: 1.0
+  H: 1.3  # 수식어 값 30% 증가
+  L: 1.6  # 수식어 값 60% 증가
+
+examples:
+  R등급_강력한:
+    base: "공격력 +25%"
+    multiplier: 1.0
+    final: "+25%"
+
+  H등급_강력한:
+    base: "공격력 +25%"
+    multiplier: 1.3
+    final: "+32.5%"
+
+  L등급_강력한:
+    base: "공격력 +25%"
+    multiplier: 1.6
+    final: "+40%"
+```
+
+### 수식어 테이블 예시
+
+```yaml
+prefix_modifiers:
+  offensive_flat:
+    - id: 1, name: "맹공의", stat: "attack", type: "flat", base_ratio: 0.5
+    - id: 2, name: "날카로운", stat: "armor_penetration", type: "flat", base_ratio: 0.3
+
+  offensive_percent:
+    - id: 10, name: "강력한", stat: "attack", type: "percent", base_ratio: 0.5
+    - id: 11, name: "치명적인", stat: "crit_rate", type: "percent", base_ratio: 0.5
+    - id: 12, name: "파괴의", stat: "crit_damage", type: "percent", base_ratio: 0.4
+    - id: 13, name: "신속한", stat: "evasion_pierce", type: "percent", base_ratio: 0.3
+
+  defensive_flat:
+    - id: 20, name: "견고한", stat: "defense", type: "flat", base_ratio: 0.5
+    - id: 21, name: "생명의", stat: "hp", type: "flat", base_ratio: 0.5
+
+  defensive_percent:
+    - id: 30, name: "튼튼한", stat: "defense", type: "percent", base_ratio: 0.5
+    - id: 31, name: "민첩한", stat: "evasion", type: "percent", base_ratio: 0.4
+
+suffix_modifiers:
+  utility:
+    - id: 100, name: "행운", stat: "drop_rate_bonus", type: "percent", base_ratio: 0.3
+    - id: 101, name: "번영", stat: "gold_bonus", type: "percent", base_ratio: 0.4
+    - id: 102, name: "성장", stat: "exp_bonus", type: "percent", base_ratio: 0.4
+
+note: "base_ratio는 장비 기본 스탯 대비 옵션 평균값 비율"
 ```
 
 ## 구현 체크리스트
