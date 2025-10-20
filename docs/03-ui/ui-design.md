@@ -168,12 +168,11 @@ icons:
 ## 반응형 디자인
 
 ```yaml
-desktop:
-  resolution: "1920x1080 기준"
-  scaling: "16:9, 16:10 지원"
-
 mobile:
-  future: "터치 최적화 (향후 확장)"
+  resolution: "FHD(2340x1080) 기준"
+  scaling: "16:9~20:9 대응"
+  input: "터치 중심 UX"
+  future: "태블릿/PC 포팅은 MVP 이후 별도 계획 수립"
 ```
 
 ## 구현 우선순위

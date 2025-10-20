@@ -91,6 +91,9 @@
 
 ## Common Response Schema
 
+> **표준화 예정**  
+> 공통 응답/에러 스펙은 MVP 확정 후 업계 표준(JSON:API 혹은 OAS 기반 포맷) 가운데 하나로 정해 별도 문서에 반영합니다. 현재는 스텁 형태로 기본 구조만 기술합니다.
+
 ```json
 {
   "success": true,

@@ -20,6 +20,8 @@
 4. 메타 업데이트 시 새 장비 풀을 다운로드하고 파티 구성을 조정한다.
 
 ## Mechanics
+> **강화·분해 기획 스텁**  
+> 강화, 재련, 분해 규칙은 별도 전용 기획서가 필요합니다. 본 문서는 MVP 범위 확정 전까지 구조만 정의하며, 상세 로직은 후속 문서에서 다룹니다.
 - **착용 규칙**: 슬롯, 클래스 제한, 파티 조건 등은 `equipment_slots.csv`와 `equipment_restrictions.csv`에 정의한다.  
 - **옵션 롤링**: 희귀도별 옵션 수/값 범위는 `equipment_affix_rules.csv`에서 관리한다.  
 - **강화/재련**: 강화 재료 및 확률은 `equipment_upgrade_rules.csv`에 기록한다.  
@@ -32,7 +34,6 @@
 
 ## Open Questions
 - `equipment_upgrade_rules` : 강화 성공/실패, 파괴 여부에 대한 정책 확정 필요.  
-- `affix_category_cap` : 같은 카테고리 옵션 중복 제한 여부.  
 - `set_effects` : 세트 효과 도입 시 데이터 구조 및 UI 설계.  
 - `legendary_uniques` : 고유 장비(고정 옵션) 추가 시 밸런스 검토.
 

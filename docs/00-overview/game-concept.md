@@ -6,7 +6,7 @@
 title: "Castle Lord Tycoon"
 genre: "중세시대 기반 쿼터뷰 오픈월드 RPG + 자동 전투"
 camera: "아이소메트릭"
-target_platform: "모바일"
+target_platform: "모바일(Android)"
 dev_type: "1인 개발"
 ```
 
@@ -108,7 +108,7 @@ end_game:
     - 영웅 환생 경험
     - 상위 계급 도달
 
-roop:
+loop:
   duration: "-"
   goals:
     - 모든 마을/요새 점령
@@ -131,13 +131,13 @@ roop:
 ### Phase 2: 핵심 루프
 - [ ] 깃발/영토 시스템
 - [ ] 자동 점령
-- [ ] 영웅 ★1-★4
+- [ ] 1~4성 영웅 구현
 - [ ] 장비 전체 등급
 - [ ] 마을 추가
 
 ### Phase 3: 콘텐츠 확장
 - [ ] 지역 5개 이상
-- [ ] 영웅 ★5-★6
+- [ ] 5~6성 영웅 구현
 - [ ] 요새 시스템 완성
 - [ ] 계급 전체 단계
 
