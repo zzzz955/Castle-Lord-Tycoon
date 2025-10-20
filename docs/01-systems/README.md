@@ -1,50 +1,29 @@
-# 01-systems - 핵심 시스템
+# Systems Documentation
 
-## 목적
-게임의 핵심 메커닉과 시스템을 정의하는 영역
+이 디렉터리는 플레이어가 체감하는 핵심 시스템을 정의합니다. 각 문서는 **의도 → 플레이 흐름 → 데이터 훅 → 기술 경계 → 미해결 사항** 순으로 정리되어 있으며, 구체적인 수치/필드명은 `docs/02-data/`에서 관리합니다.
 
-## 시스템 목록
+## Index
 
-### world-exploration.md
-필드 탐험, 전장의 안개, 야영 시스템
-
-### territory.md
-깃발 설치, 영토 편입 메커닉
-
-### settlement.md
-마을, 요새, 자동 점령 시스템
-
-### combat.md
-3×3 그리드 자동 전투, 속성 상성, 보상 분배
-
-### character.md
-영웅 시스템, 별(★) 등급, 성장, 파티 편성
-
-### equipment.md
-장비 등급, 옵션 구조, 드랍 시스템
-
-### encounter.md
-조우 발생, 스폰 테이블, 지역 난이도
-
-### progression.md
-계급(작위) 시스템, 혜택, 성장 곡선
-
-## 시스템 연관도
-
-```
-World Exploration → Encounter → Combat
-                                   ↓
-Character + Equipment → Combat Result → Progression
-                                   ↓
-                            Territory Expansion
-                                   ↓
-                            Settlement Conquest
-```
+| 문서 | 내용 요약 |
+| --- | --- |
+| `world-exploration.md` | 타일 기반 탐험, 시야, 캠핑 |
+| `territory.md` | 깃발 배치와 영토 점령 |
+| `settlement.md` | 마을/요새 점령과 허브 기능 |
+| `combat.md` | 3×3 자동 전투, 라운드 규칙 |
+| `character.md` | 영웅 수집·육성·편성 |
+| `equipment.md` | 장비 슬롯, 옵션, 강화 |
+| `encounter.md` | 조우 트리거와 이벤트 |
+| `progression.md` | 계급 조건과 보너스 |
+| `economy.md` | 상점·교환·제작 경제 루프 |
 
 ## 작성 가이드
 
-각 시스템 문서는:
-1. **독립적으로 이해 가능**해야 함
-2. **다른 시스템과의 연동** 명시
-3. **구현 가능한 수준의 구체성** 유지
-4. **데이터 구조 예시** 포함
+1. **추상화 유지**: 구조/흐름/결정 이유만 서술하고, 실수치는 데이터 문서에 위임합니다.  
+2. **데이터 참조**: 표나 텍스트에서 항상 해당하는 메타 테이블 이름을 명시합니다.  
+3. **Open Questions**: 결정되지 않은 항목은 문서 말미에 bullet로 정리합니다.  
+4. **Cross-Link**: 다른 시스템과의 의존관계는 `Dependencies` 섹션에서 문서명을 인용합니다.
+
+---
+**최종 수정**: 2025-10-21  
+**상태**: 개편중  
+**작성자**: SangHyeok  

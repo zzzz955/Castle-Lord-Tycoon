@@ -1,79 +1,57 @@
-# 지역 데이터
+# Region & Biome Specification
 
-## 스키마
+월드 탐험 시스템에서 사용하는 지역/바이옴/정착지 메타데이터를 정의합니다. 모든 값은 스프레드시트에서 유지합니다.
+
+## Region Schema
 
 ```typescript
-interface Region {
+interface RegionTemplate {
   id: string;
-  name: string;
-  difficulty: number;
-
-  biomes: Biome[];
-  towns: Town[];
-  fortresses: Fortress[];
-
-  recommendedLevel: [number, number];
-}
-
-interface Biome {
-  tag: string;  // "초원_풀숲"
-  encounterRate: number;
-  spawnTable: string;  // spawn table ID
+  display_name: LocalizedString;
+  difficulty: number;               // 1~10 scale for matchmaking
+  recommended_level_min: number;
+  recommended_level_max: number;
+  biome_ids: string[];               // References biome_tags.csv
+  town_ids: string[];                // References settlement templates
+  fortress_ids: string[];            // References settlement templates
+  unlock_conditions: string[];       // e.g. rank requirements, story flags
 }
 ```
 
-## 지역 목록
+## Biome Schema
 
-### 초원 지대
-
-```yaml
-id: "starter_plains"
-name: "초원 지대"
-difficulty: 1
-recommended_level: [1, 10]
-
-biomes:
-  - tag: "초원_풀숲"
-    encounter_rate: 20%
-    spawns: ["slime", "wolf", "bee"]
-
-  - tag: "초원_도로"
-    encounter_rate: 10%
-    spawns: ["wolf"]
-
-towns:
-  - { id: "town_start", name: "시작 마을", owned: true }
-  - { id: "town_plains_01", name: "초원 전초기지" }
-  - { id: "town_plains_02", name: "농장 마을" }
-
-fortresses:
-  - { id: "fort_plains_01", name: "폐허 요새" }
+```typescript
+interface BiomeTag {
+  id: string;                        // e.g. plains_grass
+  encounter_table_id: string;        // Reference to encounter_tables.csv
+  movement_modifier: number;         // Multiplier for movement speed
+  visibility_modifier: number;       // Fog expansion multiplier
+  notes: string;
+}
 ```
 
-### 검은 숲
+## Source Tables
 
-```yaml
-id: "dark_forest"
-name: "검은 숲"
-difficulty: 3
-recommended_level: [15, 25]
+| 파일 | 설명 |
+| --- | --- |
+| `region_templates.csv` | 지역 기본 정보 및 참조 ID |
+| `biome_tags.csv` | 바이옴 속성, 조우 테이블 매핑 |
+| `region_settlements.csv` | 지역별 마을/요새 배치 |
+| `region_links.csv` | 지역 간 이동/해금 조건 |
 
-# 향후 작성
-```
+## Export Targets
 
-### 철의 요새
+- `meta/world/regions.json`  
+- `meta/world/biomes.json`  
+- `meta/world/region_links.json`
 
-```yaml
-# 향후 작성
-```
+## Authoring Notes
 
-### 용의 협곡
-
-```yaml
-# 향후 작성
-```
+- 지역/바이옴 ID는 `snake_case`로 작성한다.  
+- 정착지 ID는 `settlement.md`에서 정의된 템플릿과 동일해야 한다.  
+- 난이도와 추천 레벨은 `balance-formulas.md`의 진행 곡선과 일치하도록 유지한다.
 
 ---
-**최종 수정**: 2025-10-19
-**상태**: ⚪ 미작성 (예시만)
-**작성자**: SangHyeok
+**최종 수정**: 2025-10-21  
+**상태**: 초안  
+**작성자**: SangHyeok  
