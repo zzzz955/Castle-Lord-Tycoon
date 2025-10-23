@@ -1,5 +1,0 @@
-﻿hero_id,effect_id,unlock_rank,description
-hero_knight,buff_guardian_wall,castellan,Gain defensive wall at battle start
-hero_archer,buff_ranger_focus,baron,Gain focus stacks each turn
-hero_mage,debuff_wolf_bleed,count,Apply bleed on crit hits
-hero_priest,buff_priest_grace,castellan,Heal allies grants grace shield

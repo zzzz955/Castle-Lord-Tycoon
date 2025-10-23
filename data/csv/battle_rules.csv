@@ -1,2 +1,0 @@
-﻿rule_id,grid_width,grid_height,round_limit,round_limit_policy,turn_priority_order,min_damage,boss_hp_multiplier,log_retention_days
-mvp_default,3,3,10,end_on_timeout,"frontline,midline,backline",5,1.25,7

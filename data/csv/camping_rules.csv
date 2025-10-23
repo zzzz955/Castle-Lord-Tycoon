@@ -1,3 +1,0 @@
-﻿rule_id,allowed_biomes,base_heal_pct,fatigue_recovery_pct,cooldown_minutes,requires_item
-mvp_default,"grasslands|frontier",35,20,30,false
-ruins_emergency,ruins,20,10,45,true

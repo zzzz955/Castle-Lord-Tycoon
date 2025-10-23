@@ -1,6 +1,0 @@
-﻿grade_id,display_name_ko,display_name_en,color_hex,drop_weight,max_affixes,base_stat_multiplier
-c,일반,Common,#FFFFFF,100,1,1.0
-uc,고급,Uncommon,#7FFF00,60,2,1.1
-r,희귀,Rare,#3CB4FF,35,3,1.25
-h,영웅,Heroic,#9370DB,10,4,1.4
-l,전설,Legendary,#FFA500,2,4,1.6

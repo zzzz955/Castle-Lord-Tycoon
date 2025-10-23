@@ -1,5 +1,0 @@
-﻿hero_id,display_name_ko,display_name_en,rarity,role,element,base_hp,base_attack,base_defense,base_speed,starting_rank,unlock_source
-hero_knight,기사단장,Guardian,3,tank,earth,1200,95,140,80,castellan,story_prologue
-hero_archer,숲의추적자,Forest Ranger,3,damage,wind,850,145,80,120,castellan,story_prologue
-hero_mage,비전학자,Arcane Scholar,4,damage,fire,780,160,70,115,baron,fortress_clear_01
-hero_priest,빛의사도,Radiant Adept,3,support,light,900,90,95,105,castellan,town_quest_01

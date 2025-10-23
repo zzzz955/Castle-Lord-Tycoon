@@ -1,3 +1,0 @@
-﻿mode_id,description,party_size,round_limit,auto_retry_allowed
-story_normal,Story encounter,4,10,false
-fortress_boss,Fortress boss battle,6,12,false

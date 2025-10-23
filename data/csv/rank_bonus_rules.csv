@@ -1,5 +1,0 @@
-﻿rank_id,bonus_type,target,value
-baron,shop_discount,all_shops,5
-count,shop_discount,all_shops,8
-marquis,crafting_cost_reduction,all_recipes,10
-count,camping_efficiency,base,12
