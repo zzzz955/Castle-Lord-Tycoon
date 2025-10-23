@@ -1,32 +1,29 @@
-# Data Specifications
+# Data Documentation (MVP)
 
-이 디렉터리는 스프레드시트 기반 메타 데이터를 정의하고, `tools/build-meta` 스크립트가 생성하는 JSON 산출물과의 매핑을 설명합니다. 시스템 문서는 여기서 정의된 키와 파일을 참조합니다.
+## 범위
+- 현재 시스템 문서(01-systems)를 기준으로 **MVP에 직접 사용되는 CSV**만 관리한다.
+- 아직 도입되지 않은 기능(교환, 제작, 이벤트 조우 등)은 CSV를 생성하지 않는다.
 
-## 작업 절차
+## 핵심 파일
+| 파일 | 용도 | 관련 시스템 |
+| --- | --- | --- |
+| `enemy_encounters.csv` | 필드별 전투 조우 테이블 | encounter, enemy |
+| `shop_equipment_pool.csv` | 마을별 장비 슬롯 풀 | shop |
+| `shop_shared_pool.csv` | 공용 슬롯 출현 품목/확률 | shop, economy |
+| `shop_flag_inventory.csv` | 깃발 판매/환매 정보 | shop, territory |
+| `forge_upgrade_rules.csv` | 강화 확률, 보호석 사용 | forge, equipment |
+| `forge_synthesis_rules.csv` | 장비 합성 확률/골드 | forge |
+| `tavern_recruitment_tiers.csv` | 영웅 모집 쿨타임/성급 분포 | tavern, character |
+| `flag_templates.csv` | 깃발 크기/가격/계급 조건 | territory, progression |
+| `rank_requirements.csv` | 계급 요구 영토, 누적 보너스 | progression |
 
-1. 스프레드시트에서 테이블을 수정하고 `data-glossary.md`에 있는 탭 규칙을 따른다.  
-2. 로컬에서 `tools/build-meta`를 실행해 CSV/JSON을 생성한다.  
-3. 산출물과 `meta/manifest.json`을 커밋하고, `CHANGELOG.md`에 변경사항을 기록한다.  
-4. CI가 메타 버전을 확인해 서버/클라이언트 배포에 반영한다.
-
-## 문서 목록
-
-| 문서 | 내용 |
-| --- | --- |
-| `data-glossary.md` | 테이블/출력 파일 목록 및 상태 |
-| `balance-formulas.md` | 전투/성장 공식과 파라미터 정의 |
-| `monsters.md` | 몬스터 템플릿 스키마와 작성 규칙 |
-| `equipment-pool.md` | 장비 템플릿/옵션 스키마 및 샘플 |
-| `regions.md` | 월드 지역/바이옴 템플릿 스키마 |
-
-## 포맷 규칙
-
-- **CSV**: 기본 저장 포맷. 첫 행은 필드명, snake_case 사용.  
-- **JSON**: 배포용 포맷, `tools/build-meta`가 생성.  
-- **샘플 코드**: 문서에서는 TypeScript/C# 인터페이스로 스키마 예시만 제공한다.  
-- **버전 필드**: 각 산출물에는 `meta_version`을 포함시켜 서버가 클라이언트 업데이트를 통지할 수 있도록 한다.
+## 작성 가이드
+1. **구조 우선**: 컬럼 이름, 데이터 타입, 제약 조건을 먼저 정의하고 수치는 추후 조정한다.  
+2. **팁**: 확률은 basis point(10000 단위), 퍼센트는 정수 고정소수(×100)로 저장한다.  
+3. **버전 관리**: CSV 변경 시 `metadata-pipeline.md` 절차에 따라 manifest를 갱신한다.  
+4. **Stub 관리**: 미구현 기능에 대한 CSV는 생성하지 않고, Stub 표기만 남긴다.
 
 ---
-**최종 수정**: 2025-10-21  
-**상태**: 개편중  
-**작성자**: SangHyeok  
+**최종 수정**: 2025-10-24  
+**상태**: MVP 범위 정리  
+**작성자**: SangHyeok
