@@ -84,7 +84,7 @@
 | 트리거 | `battle_start`, `round_start`, `on_first_attack`, `on_first_hit`, `on_attack`, `on_hit`, `on_ally_death`, `on_enemy_death`, `on_self_death`, `on_hp_threshold`, `random_chance` | `max_rounds`, `max_hits`, `probability (basis point)`, `hp_threshold`, `enemy_type` |
 | 조건 | `stat_compare`, `with_hero`, `enemy_attribute`, `ally_count`, `self_buff_state` | 비교 스탯, 대상 영웅 ID, 속성 태그 등 |
 | 대상 | `self`, `ally_all`, `ally_random`, `ally_lowest_hp`, `enemy_all`, `enemy_random`, `enemy_column`, `target_chain`, `{hero_id}_synergy` | `count`, `stat=hp_min`, `line=row`, `include_dead=true` 등 |
-| 액션 | `deal_damage`, `multi_hit`, `split_damage`, `reduce_attack`, `reduce_defense`, `ignore_defense`, `extra_hit`, `guaranteed_hit`, `stun`, `silence`, `poison`, `damage_reduction`, `revive`, `reduce_crit`, `buff_attack`, `buff_defense`, `heal_percent`, `increase_probability`, `exp_bonus`, `gold_bonus`, `drop_bonus`, `shield`, `force_attack_self`, `lifesteal` | 파라미터 예: `damage_percent`, `hit_count`, `duration_rounds`, `amount_percent`, `max_stacks` 등 |
+| 액션 | `deal_damage`, `multi_hit`, `split_damage`, `reduce_attack`, `reduce_defense`, `ignore_defense`, `extra_hit`, `guaranteed_hit`, `stun`, `silence`, `poison`, `damage_reduction`, `revive`, `reduce_crit`, `buff_attack`, `buff_defense`, `heal_percent`, `increase_probability`, `exp_bonus`, `gold_bonus`, `drop_bonus`, `shield`, `force_attack_self`, `lifesteal`, `dodge_chance` | 파라미터 예: `damage_percent`, `hit_count`, `duration_rounds`, `amount_percent`, `max_stacks`, `dodge_percent` 등 |
 
 새로운 트리거/조건/대상/액션이 필요하면 각 테이블에 행을 추가한 뒤 템플릿에서 참조만 하면 된다.
 
@@ -112,6 +112,17 @@
 
 → 나폴레옹: 첫 공격 시 150% 데미지로 2회 추가 공격  
 → 잔 다르크: 첫 공격 시 180% 데미지로 1회 추가 공격
+
+### 3) 회피형 액션 예시
+| effect_id | name | trigger_id | target_selector_id | action_id | param_count | description_template |
+| --- | --- | --- | --- | --- | --- | --- |
+| UE0105 | effect.name.105 / "기민한 회피" | TRIG_ON_HIT | TSEL_SELF | ACT_DODGE_CHANCE | 1 | effect.desc.105 / "피격 시 {value1}% 확률로 공격을 회피한다" |
+
+| hero_id | effect_id | param1 |
+| --- | --- | --- |
+| HERO_FIELD_BOSS | UE0105 | 2500 |
+
+→ 해당 보스는 피격 시 25% 확률로 공격을 회피한다(25.00%).
 
 ## 구현 참고
 1. 전투 엔진은 영웅 진입 시 `hero_effects`를 불러와 템플릿과 병합하여 효과 객체를 만든다.
