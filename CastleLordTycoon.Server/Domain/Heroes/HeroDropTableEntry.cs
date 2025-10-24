@@ -12,4 +12,7 @@ public sealed class HeroDropTableEntry
 
     [Name("weight")]
     public int Weight { get; init; }
+
+    [Name("notes_ko")]
+    public string NotesKo { get; init; } = string.Empty;
 }

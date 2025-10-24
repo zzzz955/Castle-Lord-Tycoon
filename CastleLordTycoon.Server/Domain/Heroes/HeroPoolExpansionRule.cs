@@ -4,11 +4,11 @@ namespace CastleLordTycoon.Server.Domain.Heroes;
 
 public sealed class HeroPoolExpansionRule
 {
-    [Name("slot_cap")]
-    public int SlotCap { get; init; }
+    [Name("current_slot_count")]
+    public int CurrentSlotCount { get; init; }
 
-    [Name("gold_cost")]
-    public int GoldCost { get; init; }
+    [Name("expansion_cost_gold")]
+    public int ExpansionCostGold { get; init; }
 
     [Name("notes_ko")]
     public string NotesKo { get; init; } = string.Empty;

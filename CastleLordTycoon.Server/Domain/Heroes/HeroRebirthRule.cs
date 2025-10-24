@@ -4,23 +4,17 @@ namespace CastleLordTycoon.Server.Domain.Heroes;
 
 public sealed class HeroRebirthRule
 {
-    [Name("rebirth_stage")]
-    public int RebirthStage { get; init; }
+    [Name("material_level_min")]
+    public int MaterialLevelMin { get; init; }
 
-    [Name("required_level")]
-    public int RequiredLevel { get; init; }
+    [Name("material_level_max")]
+    public int MaterialLevelMax { get; init; }
 
-    [Name("required_material_id")]
-    public string RequiredMaterialId { get; init; } = string.Empty;
+    [Name("growth_transfer_pct")]
+    public int GrowthTransferPct { get; init; }
 
-    [Name("required_material_amount")]
-    public int RequiredMaterialAmount { get; init; }
-
-    [Name("gold_cost")]
-    public int GoldCost { get; init; }
-
-    [Name("stat_bonus_pct")]
-    public int StatBonusPct { get; init; }
+    [Name("success_rate_pct")]
+    public int SuccessRatePct { get; init; }
 
     [Name("notes_ko")]
     public string NotesKo { get; init; } = string.Empty;
