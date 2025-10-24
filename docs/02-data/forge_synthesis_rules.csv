@@ -1,5 +1,5 @@
-input_grade,result_grade,input_required_count,catalyst_item_id,catalyst_amount,gold_cost,success_rate_bps,protect_on_fail,notes_ko
-C,UC,3,ITEM_HERO_SHARD_COMMON,5,5000,8000,FALSE,"같은 장비 3개 + 기본 조각으로 UC 제작"
-UC,R,3,ITEM_HERO_SHARD_RARE,8,15000,7000,FALSE,"같은 장비 3개 + 정예 조각으로 R 제작"
-R,H,3,ITEM_RARE_RELIC,3,40000,5000,FALSE,"같은 장비 3개 + 희귀 유물 파편으로 H 제작"
-H,L,3,ITEM_MYTHIC_RELIC,2,80000,3000,FALSE,"같은 장비 3개 + 전설 유물 파편으로 L 제작"
+﻿input_grade,result_grade,input_required_count,gold_cost,success_rate_bps,notes_ko
+C,UC,2,500,9000,"동일 등급/동일 레벨 장비 2개 + 골드"
+UC,R,2,2500,6000,"동일 등급/동일 레벨 장비 2개 + 골드"
+R,H,2,12500,4000,"동일 등급/동일 레벨 장비 2개 + 골드"
+H,L,2,62500,3000,"동일 등급/동일 레벨 장비 2개 + 골드"

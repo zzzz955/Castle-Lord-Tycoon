@@ -1,4 +1,5 @@
-grade_min,grade_max,option_change_item_id,item_cost,gold_cost,reroll_stat_count,notes_ko
-UC,R,ITEM_OPTION_REROLL,1,2000,1,"언커먼~레어 장비 옵션 1개 재설정"
-R,H,ITEM_OPTION_REROLL_PREMIUM,1,3500,1,"레어~영웅 장비 옵션 재설정"
-H,L,ITEM_OPTION_REROLL_PREMIUM,2,6000,2,"영웅~전설 장비 옵션 2개 동시 재설정"
+﻿grade,option_change_item_id,runs_required_count,notes_ko
+UC,ITEM_OPTION_REROLL,1,"UC 등급 옵션 변경권 1개 필요"
+R,ITEM_OPTION_REROLL,2,"R 등급 옵션 변경권 2개 필요"
+H,ITEM_OPTION_REROLL,3,"H 등급 옵션 변경권 3개 필요"
+L,ITEM_OPTION_REROLL,4,"L 등급 옵션 변경권 4개 필요"
