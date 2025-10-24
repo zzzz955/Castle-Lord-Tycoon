@@ -31,7 +31,7 @@
 5. 실패 → Toast + 다시 TitleMenu. (권한 문제일 경우 `TryAutoLogin` 재시도)
 
 ### 4.2 Google Play Games Sign-In
-- Boot 단계에서 RefreshToken이 없거나 만료되면 `Sign In with Google Play Games` 버튼이 메인으로 노출된다.  
+- Boot 단계에서 RefreshToken이 없거나 만료되면 `Google 계정 로그인` 버튼이 메인으로 노출된다.  
 - 성공 시 AccessToken/RefreshToken 저장 → UI 상태를 `Continue` 강조로 업데이트.  
 - `Switch Account` 시 `PlayGamesPlatform.Instance.SignOut()` 후 재로그인 UI 호출. 성공 시 기존 세션 정리.
 
@@ -69,5 +69,5 @@
 
 ---
 **최종 수정**: 2025-10-26  
-**상태**: 초안  
+**상태**: 1차 검수 완료  
 **작성자**: SangHyeok  
