@@ -16,12 +16,6 @@ public sealed class GemCombinationRule
     [Name("gold_cost")]
     public int GoldCost { get; init; }
 
-    [Name("required_shard_id")]
-    public string RequiredShardId { get; init; } = string.Empty;
-
-    [Name("required_shard_amount")]
-    public int RequiredShardAmount { get; init; }
-
     [Name("notes_ko")]
     public string NotesKo { get; init; } = string.Empty;
 }
