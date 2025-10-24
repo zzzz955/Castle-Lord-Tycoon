@@ -1,5 +1,8 @@
-// .env.dev 파일 로드 (로컬 개발 환경용)
-// 배포 환경에서는 docker-compose.prod.yml이 환경 변수를 직접 주입하므로 이 부분이 실행되지 않아도 됨
+using CastleLordTycoon.Server.Configuration;
+using CastleLordTycoon.Server.Metadata;
+using CastleLordTycoon.Server.Services.Encounters;
+using CastleLordTycoon.Server.Services.Metadata;
+
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 if (environment == "Development")
 {
@@ -8,27 +11,35 @@ if (environment == "Development")
     if (File.Exists(dotenv))
     {
         DotNetEnv.Env.Load(dotenv);
-        Console.WriteLine($"✅ Loaded environment variables from: {dotenv}");
+        Console.WriteLine($"Loaded environment variables from: {dotenv}");
     }
     else
     {
-        Console.WriteLine($"⚠️  .env.dev not found at: {dotenv}");
+        Console.WriteLine($".env.dev not found at: {dotenv}");
     }
 }
 else
 {
-    Console.WriteLine($"🚀 Running in {environment} mode - using environment variables from container");
+    Console.WriteLine($"Running in {environment} mode - using container environment variables");
 }
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<MetadataOptions>(builder.Configuration.GetSection("Metadata"));
+builder.Services.AddSingleton<IMetadataFileResolver, MetadataFileResolver>();
+builder.Services.AddSingleton<IGameMetadataProvider, GameMetadataProvider>();
+builder.Services.AddSingleton<IEncounterConfigService, EncounterConfigService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var metadataProvider = scope.ServiceProvider.GetRequiredService<IGameMetadataProvider>();
+    metadataProvider.GetSnapshot();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -36,28 +47,43 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapGet("/metadata/encounters", (IEncounterConfigService service) =>
+    Results.Ok(service.GetAll().Select(config => new
+    {
+        config.FieldId,
+        config.FieldNameKo,
+        config.FieldTier,
+        config.EncounterType,
+        Enemy = new
+        {
+            config.Enemy.EnemyId,
+            Name = config.Enemy.EnemyNameKo,
+            config.Enemy.Attribute,
+            config.Enemy.Type,
+            config.Enemy.BaseLevel
+        },
+        StatModifier = new
+        {
+            config.StatModifier.ModifierId,
+            Name = config.StatModifier.ModifierNameKo,
+            config.StatModifier.AttackScalePct,
+            config.StatModifier.DefenseScalePct,
+            config.StatModifier.HpScalePct
+        },
+        DropTable = config.DropTableEntries.Select(entry => new
+        {
+            entry.EntryId,
+            entry.RewardType,
+            entry.RewardId,
+            entry.RewardNameKo,
+            entry.DropRateBasisPoints,
+            entry.AmountMin,
+            entry.AmountMax
+        }),
+        SpawnRateBasisPoints = config.RawEncounter.SpawnRateBasisPoints,
+        DropTableId = config.RawEncounter.DropTableId,
+        Notes = config.RawEncounter.NotesKo
+    })))
+    .WithName("GetEncounterMetadata");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
