@@ -1,0 +1,7 @@
+condition_id,condition_type,options_json,description_token_ko,notes
+COND_NONE,none,{},condition.none,"조건 없음"
+COND_STAT_COMPARE,stat_compare,{"stat":"hp","operator":"<","value":5000},condition.stat_compare,"능력치 비교 조건"
+COND_WITH_HERO,with_hero,{"hero_id":"HERO_EXAMPLE"},condition.with_hero,"특정 영웅과 함께 전투 시"
+COND_ENEMY_ATTRIBUTE,enemy_attribute,{"attribute":"fire"},condition.enemy_attribute,"적 속성 조건"
+COND_ALLY_COUNT,ally_count,{"min_count":3},condition.ally_count,"아군 수 조건"
+COND_SELF_BUFF_STATE,self_buff_state,{"buff_type":"attack_up"},condition.self_buff_state,"자신 버프 상태 조건"

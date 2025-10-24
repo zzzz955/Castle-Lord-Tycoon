@@ -1,0 +1,11 @@
+selector_id,target_type,options_json,description_token_ko,notes
+TSEL_SELF,self,{},selector.self,"자기 자신"
+TSEL_ALLY_ALL,ally_all,{},selector.ally_all,"아군 전체"
+TSEL_ALLY_RANDOM,ally_random,{"count":1},selector.ally_random,"아군 무작위"
+TSEL_ALLY_LOWEST_HP,ally_lowest_hp,{"count":1},selector.ally_lowest_hp,"HP가 가장 낮은 아군"
+TSEL_ENEMY_ALL,enemy_all,{},selector.enemy_all,"적 전체"
+TSEL_ENEMY_RANDOM,enemy_random,{"count":1},selector.enemy_random,"적 무작위"
+TSEL_ENEMY_FRONT,enemy_front,{},selector.enemy_front,"전방 적"
+TSEL_ENEMY_COLUMN,enemy_column,{"column":0},selector.enemy_column,"적 특정 열"
+TSEL_TARGET,target,{},selector.target,"공격 대상"
+TSEL_TARGET_CHAIN,target_chain,{"count":2},selector.target_chain,"연쇄 대상"

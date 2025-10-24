@@ -1,5 +1,4 @@
-rebirth_stage,required_level,required_material_id,required_material_amount,gold_cost,stat_bonus_pct,notes_ko
-1,30,ITEM_HERO_EMBLEM_I,5,5000,500,"1차 환생"
-2,60,ITEM_HERO_EMBLEM_II,10,15000,900,"2차 환생"
-3,90,ITEM_HERO_EMBLEM_III,15,35000,1400,"3차 환생"
-4,120,ITEM_HERO_EMBLEM_IV,20,60000,1900,"4차 환생"
+material_level_min,material_level_max,growth_transfer_pct,success_rate_pct,notes_ko
+30,59,1000,10000,"30-59레벨 제물: 성장치 10% 이관, 확률 100%"
+60,89,2000,10000,"60-89레벨 제물: 성장치 20% 이관, 확률 100%"
+90,200,3000,10000,"90레벨 이상 제물: 성장치 30% 이관 (고정), 확률 100%"

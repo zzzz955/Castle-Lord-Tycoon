@@ -1,7 +1,7 @@
-star_rating,reward_item_id,reward_amount,reward_currency,notes_ko
-1,ITEM_HERO_SHARD_COMMON,5,0,"1성 영웅 방출"
-2,ITEM_HERO_SHARD_COMMON,8,200,"2성 영웅 방출"
-3,ITEM_HERO_SHARD_RARE,6,400,"3성 영웅 방출"
-4,ITEM_HERO_SHARD_RARE,10,800,"4성 영웅 방출"
-5,ITEM_RARE_RELIC,3,1500,"5성 영웅 방출"
-6,ITEM_MYTHIC_RELIC,2,3000,"6성 영웅 방출"
+star_rating,fragment_item_id,fragment_amount,notes_ko
+1,FRAG_HERO_STAR_1,10,"⭐ 1성 영웅 방출 (골드 지급 없음)"
+2,FRAG_HERO_STAR_2,30,"⭐⭐ 2성 영웅 방출 (골드 지급 없음)"
+3,FRAG_HERO_STAR_3,120,"⭐⭐⭐ 3성 영웅 방출 (골드 지급 없음)"
+4,FRAG_HERO_STAR_4,500,"⭐⭐⭐⭐ 4성 영웅 방출 (골드 지급 없음)"
+5,FRAG_HERO_STAR_5,2400,"⭐⭐⭐⭐⭐ 5성 영웅 방출 (골드 지급 없음)"
+6,FRAG_HERO_STAR_6,9600,"⭐⭐⭐⭐⭐⭐ 6성 영웅 방출 (골드 지급 없음)"

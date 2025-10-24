@@ -1,7 +1,11 @@
-hero_id,hero_name_ko,base_star,rarity,attribute,growth_type,base_growth,unique_effect_ids,role,recruit_tier_ids
-HERO_ALICIA,기사 알리시아,3,R,light,balanced,28,UE_SHIELD_WALL,tank,"TIER_BASIC;TIER_ADVANCED"
-HERO_GAREN,사냥꾼 가렌,2,UC,wind,aggressive,22,UE_MULTI_SHOT,dps,"TIER_BASIC"
-HERO_SELENE,마도사 셀레네,4,H,arcane,aggressive,32,UE_ARCANE_SURGE,dps,"TIER_ADVANCED;TIER_SUPREME"
-HERO_BRONN,수호자 브론,3,R,earth,defensive,30,UE_STONE_SKIN,tank,"TIER_ADVANCED"
-HERO_IRENE,사제 아이린,5,H,light,support,26,UE_HEALING_ORB,support,"TIER_SUPREME"
-HERO_DARIUS,어둠추적자 다리우스,6,L,void,aggressive,36,UE_SHADOW_AURA,dps,"TIER_SUPREME"
+hero_id,hero_name_ko,star_rating,growth_type_ko,attribute,base_growth,base_attack,base_defense,base_hp,crit_rate_bp,crit_damage_bp,defense_ignore_bp,damage_reduction_bp,unique_effect_ids,release_fragment_item,localization_key,historical_figure,notes_ko
+HERO_THEODORA,테오도라,1,균등형,none,12,6000,4000,5000,1000,10000,0,0,UE_NONE,FRAG_HERO_STAR_1,hero.name.001,true,"⭐ 동로마 제국 황후, 유스티니아누스 1세의 배우자"
+HERO_MULAN,뮬란,2,공격형,fire,18,6000,4000,5000,1000,10000,0,0,"UE_SWIFT_STRIKE",FRAG_HERO_STAR_2,hero.name.002,true,"⭐⭐ 중국 전설의 여전사"
+HERO_ISABELLA,이사벨라 1세,3,균등형,water,26,6000,4000,5000,1000,10000,0,0,"UE_ROYAL_DECREE",FRAG_HERO_STAR_3,hero.name.003,true,"⭐⭐⭐ 스페인 여왕, 레콩키스타 완성"
+HERO_JOAN,잔 다르크,3,방어형,fire,28,6000,4000,5000,1000,10000,0,0,"UE_DIVINE_INSPIRATION",FRAG_HERO_STAR_3,hero.name.004,true,"⭐⭐⭐ 프랑스 구국의 성녀"
+HERO_CHARLEMAGNE,샤를마뉴,4,공격형,earth,36,6000,4000,5000,1000,10000,0,0,"UE_IMPERIAL_COMMAND;UE_FRANKISH_FURY",FRAG_HERO_STAR_4,hero.name.005,true,"⭐⭐⭐⭐ 프랑크 왕국 황제, 서유럽 통일"
+HERO_SALADIN,살라딘,4,방어형,none,38,6000,4000,5000,1000,10000,0,0,"UE_DESERT_FORTRESS;UE_CHIVALRY",FRAG_HERO_STAR_4,hero.name.006,true,"⭐⭐⭐⭐ 이슬람 영웅, 십자군 전쟁 지도자"
+HERO_CATHERINE,예카테리나 1세,5,균등형,water,45,6000,4000,5000,1000,10000,0,0,"UE_DIPLOMATIC_MASTERY;UE_WINTER_RESILIENCE",FRAG_HERO_STAR_5,hero.name.007,true,"⭐⭐⭐⭐⭐ 러시아 제국 황제"
+HERO_NOBUNAGA,오다 노부나가,5,공격형,fire,48,6000,4000,5000,1000,10000,0,0,"UE_UNIFICATION_AMBITION;UE_TANEGASHIMA",FRAG_HERO_STAR_5,hero.name.008,true,"⭐⭐⭐⭐⭐ 일본 전국시대 통일자"
+HERO_WU_ZETIAN,측천무후,6,균등형,none,55,6000,4000,5000,1000,10000,0,0,"UE_EMPRESS_AUTHORITY;UE_POLITICAL_INTRIGUE;UE_CULTURAL_PATRONAGE",FRAG_HERO_STAR_6,hero.name.009,true,"⭐⭐⭐⭐⭐⭐ 중국 유일의 여제"
+HERO_NAPOLEON,나폴레옹 보나파르트,6,공격형,fire,58,6000,4000,5000,1000,10000,0,0,"UE_TACTICAL_GENIUS;UE_ARTILLERY_COMMAND;UE_GRAND_ARMEE",FRAG_HERO_STAR_6,hero.name.010,true,"⭐⭐⭐⭐⭐⭐ 프랑스 황제, 전술의 천재"
