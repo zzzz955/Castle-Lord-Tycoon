@@ -1,4 +1,4 @@
-using CsvHelper.Configuration.Attributes;
+﻿using CsvHelper.Configuration.Attributes;
 
 namespace CastleLordTycoon.Server.Domain.Territory;
 
@@ -24,9 +24,6 @@ public sealed class FlagTemplate
 
     [Name("rank_required")]
     public string RankRequired { get; init; } = string.Empty;
-
-    [Name("max_owned")]
-    public int MaxOwned { get; init; }
 
     [Name("description_ko")]
     public string DescriptionKo { get; init; } = string.Empty;
