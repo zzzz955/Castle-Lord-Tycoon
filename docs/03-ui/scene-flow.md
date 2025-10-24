@@ -29,13 +29,12 @@
    - `/metadata/version`(추가 예정) 호출로 클라이언트 번들과 서버 버전을 비교. 불일치 시 업데이트 유도 팝업.  
    - `AuthService.Initialize()` → `TryAutoLogin()` 실행. *(우선순위: SecureStorage Refresh Token → 미존재 시 Google Play Games Sign-In 시도 → 실패 시 미로그인)*  
    - GlobalServices(GameObject) 생성 → 네트워크/데이터/오버레이 매니저를 `DontDestroyOnLoad`로 유지.  
-2. **TitleMenu**  
+2. **TitleMenu** *(세부사항: `docs/03-ui/title-menu.md`)*  
    - Boot 결과(자동 로그인 성공 여부)를 인자로 받아 초기 상태 결정.  
-   - 자동 로그인 성공 시 기본 상태를 “Continue” 강조로 설정하고, 공지 배너/웹뷰를 즉시 로드.  
+   - 자동 로그인 성공 시 “Continue” 강조 + 공지/WebView 즉시 로드.  
    - 실패 시 Google Play Games Sign-In UI를 기본 탭으로 노출.  
-   - 정보 탭: 서버 목록(멀티 서버 시), 계정 전환(Play Games 계정 전환 플로우 연결), 보안 알림(동시 접속 감지) 등 확장 가능하도록 설계.  
    - 기본 버튼: `Continue / Start Adventure`, `Announcements`, `Options`, `Exit Game`.  
-   - 플레이어가 GameWorld에서 로그아웃/타이틀 복귀를 선택하면 TitleMenu 씬을 재로드해 동일 허브를 사용한다.  
+   - GameWorld에서 `타이틀로` 선택 시 동일 씬 재로드.  
 3. **에러 처리**  
    - 네트워크 실패 → `UI.ToastLayer`, 재시도 버튼 제공.  
    - 패치 필요 → 업데이트 유도 팝업에서 마켓 이동.  
@@ -43,41 +42,14 @@
 
 부팅 중에는 `UI.LoadingOverlay`로 입력을 차단하고, TitleMenu에서 GameWorld 로 전환할 때도 동일 오버레이를 사용한다.
 
-## 4. GameWorld 구성
-- **범위**: 마을 중심부(거점 기능) + 주변 필드 + 요새 진입구까지 하나의 타일맵으로 포함.  
-- **허브 구역**  
-  - 상점, 술집, 대장간, 여관, 깃발 관리소 등은 각 위치에 `InteractionTrigger`(Collider + Prompt)를 배치.  
-  - 플레이어가 반경 내로 들어오면 상호작용 UI(버튼/버블)를 활성화하고, 터치/키 입력 시 대응 UI 패널을 `UI.ModalLayer`에 오픈.  
-  - NPC는 MVP에서도 배치하며, 깃발 구매는 상점 NPC에서 이루어진다.  
-  - 영웅 배치/파티 편성 UI는 GameWorld 내 HUD 버튼으로 열고, 전투 요청 시 최신 배치를 사용한다.  
-  - NPC/건물 내부 진입은 MVP에서 생략(포켓몬 스타일). 필요한 경우 짧은 컷씬/ 패널 전환만 사용.
-- **스폰 & 복귀**  
-  - TitleMenu에서 GameWorld 진입 직전 서버 `/player/profile` 또는 `/world/state` 응답을 통해 마지막 좌표, 시야, 진행 퀘스트를 수신.  
-  - 저장된 좌표가 유효하지 않으면 마을 중심 안전 지점으로 폴백.  
-  - 월드 내 캠핑/귀환/사망 처리 시 좌표를 즉시 서버에 업데이트해 다음 로그인 시 재사용.
-- **청크 스트리밍**  
-  - Tilemap 또는 Addressables Prefab을 64×64 타일 기준 청크로 분할.  
-  - `ChunkStreamer`가 플레이어 위치를 기준으로 가시 반경 내 청크만 활성화, 외부 청크는 비활성화 또는 언로드.  
-  - 마을 중심 청크는 항상 활성화. 요새/특수 구역은 접근 시 로딩.  
-  - 타일 충돌체도 청크 단위로 Enable/Disable.  
-- **전투 & 조우**  
-  - 이동 입력 시 좌표 이동 이벤트 → 서버 `/world/move` 또는 SignalR 전송 → 조우 발생 시 CombatOverlay 호출.  
-  - 전투 중 `GameWorld` 씬의 시간 스케일을 0 또는 입력 금지 상태로 전환.  
-  - 전투 종료 후 서버가 내려준 위치/상태를 갱신하고 보상 패널 노출.  
-- **영토 & 깃발**  
-  - 깃발 설치 모드 토글 → 설치 가능한 위치 하이라이트 → 설치 요청 시 서버 `/territory/flag`.  
-  - 소유 영토는 타일맵 레이어/Shader로 색상 강조.  
-  - 계급 변화 시 HUD 갱신 및 토스트 알림.
+## 4. GameWorld 구성 *(요약)*
+- 단일 오픈월드 씬에서 마을 허브와 필드를 함께 다루며, NPC 반경 상호작용·깃발 설치·영웅 배치 UI 등 세부 규칙은 `docs/03-ui/gameworld-hud.md`에 정리되어 있다.  
+- 씬 플로우 문서에서는 “TitleMenu → GameWorld 로드 → CombatOverlay 오픈 → GameWorld 복귀” 순환과, 씬 전환 시 공통 오버레이/서비스를 유지한다는 점만 기억하면 된다.  
+- 청크 스트리밍, 좌표 동기화, WebSocket 이벤트, 영토 하이라이트 구현 세부는 전용 문서를 참고한다.
 
-## 5. CombatOverlay 플로우
-1. `CombatController.Open(encounterPayload)` 호출 → CombatOverlay 씬 Additive 로드.  
-2. 배치 단계: 아군 3×3 슬롯 UI + 도망/전투 시작 버튼(`docs/01-systems/combat.md:24`).  
-3. 서버 `/combat/start` 호출 → 로그 수신 → Timeline 재생(속도 1×/2×/4×/8×, 스킵).  
-4. 전투 종료 → 결과 창(UI.ModalLayer)에서 경험치/골드/드랍 표시 → `Confirm` 시 씬 언로드.  
-5. 실패/무승부 시 강제 귀환 로직 호출(마을 중심 좌표 Teleport).  
-6. CombatOverlay 언로드 후 `GameWorld` 시간/입력 재개.
-
-UI는 Canvas 기반, 전투 기물은 2D Sprite 또는 UI Image로 표현해 초기 구현 부담을 줄인다.
+## 5. CombatOverlay 플로우 *(요약)*
+- 전투 트리거 수신 시 Additive 로드하여 배치 → 로그 재생 → 결과 정산까지 책임지며, 상세 UI와 서버 데이터 요구 사항은 `docs/03-ui/combat-overlay.md`에 기술돼 있다.  
+- 본 문서는 GameWorld와의 제어권 전환(입력 잠금, 시간 정지, 보상 수신 후 복귀)만 명시한다.
 
 ## 6. 공통 오버레이 & 서비스
 - `UI.LoadingOverlay`: 네트워크 대기, 씬 전환 시 활성화/비활성화.  
