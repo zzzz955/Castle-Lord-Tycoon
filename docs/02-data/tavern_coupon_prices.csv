@@ -1,0 +1,4 @@
+tier_id,coupon_item_id,coupon_name_ko,gold_cost,drop_rate_bps,notes_ko
+TIER_BASIC,COUPON_BASIC,일반 모집 쿠폰,100,1500,"튜토리얼 보상 및 드랍"
+TIER_ADVANCED,COUPON_ADVANCED,고급 모집 쿠폰,1000,800,"중반 던전 드랍"
+TIER_SUPREME,COUPON_SUPREME,최고급 모집 쿠폰,20000,200,"보스 전용 드랍"

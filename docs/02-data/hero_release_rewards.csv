@@ -1,0 +1,7 @@
+star_rating,reward_item_id,reward_amount,reward_currency,notes_ko
+1,ITEM_HERO_SHARD_COMMON,5,0,"1성 영웅 방출"
+2,ITEM_HERO_SHARD_COMMON,8,200,"2성 영웅 방출"
+3,ITEM_HERO_SHARD_RARE,6,400,"3성 영웅 방출"
+4,ITEM_HERO_SHARD_RARE,10,800,"4성 영웅 방출"
+5,ITEM_RARE_RELIC,3,1500,"5성 영웅 방출"
+6,ITEM_MYTHIC_RELIC,2,3000,"6성 영웅 방출"

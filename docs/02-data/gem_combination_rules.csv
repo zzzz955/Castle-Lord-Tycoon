@@ -1,0 +1,5 @@
+input_grade,output_grade,success_rate_bps,gold_cost,required_shard_id,required_shard_amount,notes_ko
+C,UC,7000,100,ITEM_GEM_SHARD,5,"C 2개 조합"
+UC,R,5000,400,ITEM_GEM_SHARD,12,"UC 2개 조합"
+R,H,3500,900,ITEM_GEM_SHARD,20,"R 2개 조합"
+H,L,3000,2000,ITEM_GEM_SHARD,30,"H 2개 조합"

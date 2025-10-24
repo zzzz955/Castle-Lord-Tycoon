@@ -1,0 +1,5 @@
+refresh_id,refresh_hour_utc9,applies_to,notes_ko
+DAILY_MIDNIGHT,0,all,"일일 초기화"
+DAILY_6AM,6,all,"오전 6시 갱신"
+DAILY_NOON,12,all,"정오 갱신"
+DAILY_6PM,18,all,"오후 6시 갱신"

@@ -1,0 +1,10 @@
+grade,level_min,level_max,base_price_gold,price_formula,notes_ko
+C,1,20,800,"base + level*40","초기 장비 가격"
+C,21,35,1400,"base + level*45","튜토리얼 이후 상승"
+UC,20,40,2800,"base + level*65","언커먼 시작 가격"
+UC,41,64,4200,"base + level*80","언커먼 후반부"
+R,45,70,6200,"base + level*110","레어 장비 가격"
+R,71,99,8400,"base + level*140","레어 고레벨"
+H,65,90,11200,"base + level*180","영웅 장비"
+H,91,120,14800,"base + level*220","영웅 후반"
+L,100,140,19600,"base + level*280","전설 장비 가격"

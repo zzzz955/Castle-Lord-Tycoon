@@ -1,0 +1,7 @@
+service_id,service_name_ko,service_type,description_ko
+SERVICE_INN,여관,rest,"파티 HP 즉시 회복"
+SERVICE_TAVERN,술집,recruit,"영웅 모집 및 관리"
+SERVICE_SHOP,상점,shop,"장비 및 소비품 구매"
+SERVICE_FORGE,대장간,forge,"강화, 분해, 각인"
+SERVICE_WAYPOINT,이동 포탈,travel,"점령 거점 간 이동"
+SERVICE_COMBAT_PORTAL,전투 포털,combat,"요새 전투 진입"

@@ -1,0 +1,5 @@
+rebirth_stage,required_level,required_material_id,required_material_amount,gold_cost,stat_bonus_pct,notes_ko
+1,30,ITEM_HERO_EMBLEM_I,5,5000,500,"1차 환생"
+2,60,ITEM_HERO_EMBLEM_II,10,15000,900,"2차 환생"
+3,90,ITEM_HERO_EMBLEM_III,15,35000,1400,"3차 환생"
+4,120,ITEM_HERO_EMBLEM_IV,20,60000,1900,"4차 환생"

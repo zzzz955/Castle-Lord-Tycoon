@@ -1,0 +1,5 @@
+upgrade_min,upgrade_max,success_rate_bps,cost_multiplier_pct,fail_penalty_level,protect_scroll_applicable,notes_ko
+0,4,10000,10000,0,FALSE,"100% 성공, 보호 두루마리 불필요"
+5,9,5000,12500,-1,TRUE,"실패 시 1단계 하락, 보호 두루마리 사용 권장"
+10,14,3000,16000,-1,TRUE,"중후반 강화 구간"
+15,19,1000,22000,-1,TRUE,"최종 강화, 높은 비용과 낮은 성공률"

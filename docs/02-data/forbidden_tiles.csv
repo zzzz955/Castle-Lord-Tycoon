@@ -1,0 +1,4 @@
+terrain_id,terrain_name_ko,reason_ko
+TERRAIN_WATER_DEEP,깊은 물,"깃발을 설치할 수 없는 깊은 호수/바다"
+TERRAIN_LAVA,용암 지대,"용암 지역은 영토 확장 불가"
+TERRAIN_ANCIENT_ALTAR,고대 제단,"스토리 퀘스트 전까지 봉인"

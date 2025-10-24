@@ -1,0 +1,6 @@
+grade,return_item_id,return_amount_min,return_amount_max,return_currency,notes_ko
+C,ITEM_GEM_SHARD,2,3,0,"기본 파편 반환"
+UC,ITEM_GEM_SHARD,4,6,200,"골드 200 추가 지급"
+R,ITEM_GEM_SHARD,6,9,600,"골드 600 추가 지급"
+H,ITEM_GEM_SHARD,8,12,1200,"골드 1,200 추가 지급"
+L,ITEM_GEM_SHARD,12,18,2500,"골드 2,500 추가 지급"

@@ -1,0 +1,5 @@
+flag_id,flag_name_ko,size_tiles,cost_gold,rank_required,resale_rate_pct,max_owned,icon_asset,notes_ko
+FLAG_SMALL,작은 깃발,3x3,100,RANK_LORD,2500,10,ui/flags/flag_small.png,"기본 영토 확장에 필요한 깃발"
+FLAG_MEDIUM,중형 깃발,5x5,500,RANK_BARON,2500,8,ui/flags/flag_medium.png,"중반부 거점 확장용"
+FLAG_LARGE,대형 깃발,7x7,2000,RANK_VISCOUNT,2500,6,ui/flags/flag_large.png,"대규모 영토 확보"
+FLAG_GRAND,거대 깃발,9x9,10000,RANK_GRAND_DUKE,2500,3,ui/flags/flag_grand.png,"최대 범위 영토 확장"

@@ -1,0 +1,4 @@
+tier_id,tier_name_ko,free_cooldown_hours,free_batch_size,gold_cost,coupon_item_id,required_hero_slot_free,hero_star_min,hero_star_max,star1_bps,star2_bps,star3_bps,star4_bps,star5_bps,star6_bps,notes_ko
+TIER_BASIC,일반 모집,3,1,100,COUPON_BASIC,1,1,4,5000,3000,1700,300,0,0,"초기 영웅 수급용"
+TIER_ADVANCED,고급 모집,24,1,1000,COUPON_ADVANCED,1,2,6,0,5000,3000,1800,150,50,"중급 영웅 확보용"
+TIER_SUPREME,최고급 모집,72,10,20000,COUPON_SUPREME,10,3,6,0,0,7000,2500,400,100,"후반 파티 코어 확보용"

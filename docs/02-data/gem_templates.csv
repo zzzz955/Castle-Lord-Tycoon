@@ -1,0 +1,9 @@
+gem_id,gem_name_ko,color,stat_type,grade,value_percent,description_ko
+GEM_ATTACK_C,공격 보석 C,red,attack,C,300,"무기 공격력 +3%"
+GEM_ATTACK_UC,공격 보석 UC,red,attack,UC,600,"무기 공격력 +6%"
+GEM_ATTACK_R,공격 보석 R,red,attack,R,900,"무기 공격력 +9%"
+GEM_ATTACK_H,공격 보석 H,red,attack,H,1200,"무기 공격력 +12%"
+GEM_DEFENSE_C,방어 보석 C,blue,defense,C,300,"갑옷 방어력 +3%"
+GEM_DEFENSE_UC,방어 보석 UC,blue,defense,UC,600,"갑옷 방어력 +6%"
+GEM_VITALITY_C,생명 보석 C,green,hp,C,300,"모자 체력 +3%"
+GEM_VITALITY_R,생명 보석 R,green,hp,R,900,"모자 체력 +9%"

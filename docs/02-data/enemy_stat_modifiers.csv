@@ -1,0 +1,5 @@
+modifier_id,modifier_name_ko,attack_scale_pct,defense_scale_pct,hp_scale_pct,crit_rate_bp,crit_damage_pct,armor_penetration_pct,damage_reduction_pct,description_ko
+MOD_FIELD_EASY,필드 조우-하급,9000,9000,9000,300,0,0,0,"입문 구간 기본 난이도"
+MOD_FIELD_NORMAL,필드 조우-중급,10000,10000,10500,500,0,0,0,"거점 확장 후 일반 조우"
+MOD_FIELD_ELITE,필드 조우-정예,11500,11000,12000,700,0,200,500,"정예 조우 전용 능력치 배율"
+MOD_FIELD_BOSS,필드 조우-보스,13000,12500,15000,1000,0,500,1000,"강제 전투 및 요새 보스용 배율"

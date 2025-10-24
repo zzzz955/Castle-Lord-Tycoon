@@ -1,0 +1,11 @@
+item_id,base_price_gold,bulk_limit,notes_ko
+ITEM_GEM_ATTACK_C,500,3,"C급 공격 보석"
+ITEM_GEM_DEFENSE_C,500,3,"C급 방어 보석"
+ITEM_GEM_VITALITY_C,450,3,"C급 체력 보석"
+ITEM_GEM_ATTACK_UC,1200,2,"UC급 공격 보석"
+ITEM_GEM_DEFENSE_UC,1200,2,"UC급 방어 보석"
+ITEM_PROTECT_SCROLL,1500,2,"강화 실패 방지"
+ITEM_HERO_SHARD_COMMON,800,5,"기본 영웅 계약서"
+ITEM_HERO_SHARD_RARE,2200,3,"정예 영웅 계약서"
+ITEM_OPTION_REROLL,2500,1,"일반 옵션 변경권"
+ITEM_OPTION_REROLL_PREMIUM,4800,1,"고급 옵션 변경권"

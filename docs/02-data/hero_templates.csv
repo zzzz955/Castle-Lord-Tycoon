@@ -1,0 +1,7 @@
+hero_id,hero_name_ko,base_star,rarity,attribute,growth_type,base_growth,unique_effect_ids,role,recruit_tier_ids
+HERO_ALICIA,기사 알리시아,3,R,light,balanced,28,UE_SHIELD_WALL,tank,"TIER_BASIC;TIER_ADVANCED"
+HERO_GAREN,사냥꾼 가렌,2,UC,wind,aggressive,22,UE_MULTI_SHOT,dps,"TIER_BASIC"
+HERO_SELENE,마도사 셀레네,4,H,arcane,aggressive,32,UE_ARCANE_SURGE,dps,"TIER_ADVANCED;TIER_SUPREME"
+HERO_BRONN,수호자 브론,3,R,earth,defensive,30,UE_STONE_SKIN,tank,"TIER_ADVANCED"
+HERO_IRENE,사제 아이린,5,H,light,support,26,UE_HEALING_ORB,support,"TIER_SUPREME"
+HERO_DARIUS,어둠추적자 다리우스,6,L,void,aggressive,36,UE_SHADOW_AURA,dps,"TIER_SUPREME"

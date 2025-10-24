@@ -1,0 +1,11 @@
+item_id,item_name_ko,item_type,grade,weight_bps,base_price,currency,notes_ko
+ITEM_GEM_ATTACK_C,공격 보석(C),gem,C,1200,500,gold,"무기 공격 각인 보석"
+ITEM_GEM_DEFENSE_C,방어 보석(C),gem,C,1200,500,gold,"방어 각인 보석"
+ITEM_GEM_VITALITY_C,생명 보석(C),gem,C,900,450,gold,"체력 각인 보석"
+ITEM_GEM_ATTACK_UC,공격 보석(UC),gem,UC,1100,1200,gold,"중급 공격 각인 보석"
+ITEM_GEM_DEFENSE_UC,방어 보석(UC),gem,UC,800,1200,gold,"중급 방어 각인 보석"
+ITEM_PROTECT_SCROLL,보호 두루마리,consumable,-,2000,1500,gold,"강화 실패 방지"
+ITEM_HERO_SHARD_COMMON,용병 계약서 조각,item,-,1300,800,gold,"기본 등급 영웅 조각"
+ITEM_HERO_SHARD_RARE,정예 계약서 조각,item,-,800,2200,gold,"정예 등급 영웅 조각"
+ITEM_OPTION_REROLL,옵션 변경권,consumable,-,500,2500,gold,"장비 옵션 재설정"
+ITEM_OPTION_REROLL_PREMIUM,고급 옵션 변경권,consumable,-,200,4800,gold,"상위 장비 옵션 재설정"

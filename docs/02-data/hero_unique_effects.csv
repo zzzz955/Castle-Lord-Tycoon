@@ -1,0 +1,14 @@
+effect_id,effect_name_ko,trigger_type,effect_values,description_ko
+UE_NONE,효과 없음,passive,"",효과가 없는 기본 상태
+UE_SHIELD_WALL,방패벽,passive,"damage_reduction_pct:500","전투 시작 시 파티 피해 감소 +5%"
+UE_MULTI_SHOT,다중 사격,active_on_attack,"extra_targets:2;damage_pct:60","평타 시 추가 대상 2명에게 60% 피해"
+UE_ARCANE_SURGE,비전 폭발,active_on_skill,"cooldown_turns:3;damage_pct:180","3턴마다 광역 피해 180%"
+UE_STONE_SKIN,돌가죽,passive,"defense_pct:800","방어력 +8% 및 도발 확률 증가"
+UE_HEALING_ORB,치유 구체,active_on_turn,"heal_pct:120;targets:allies","턴 종료 시 아군 전체 체력 12% 회복"
+UE_SHADOW_AURA,그림자 장막,passive,"dodge_pct:400;crit_rate_pct:300","회피 +4%, 치명타 확률 +3%"
+UE_WOLF_HOWL,늑대 울음,active_on_start,"attack_pct:150;duration_turns:2","전투 시작 시 공격력 +15% 버프"
+UE_LEADER_SHOUT,우두머리의 외침,active_on_start,"ally_attack_pct:120;duration_turns:2","아군 공격력 +12%"
+UE_BLEED_HIT,출혈 일격,active_on_hit,"bleed_damage_pct:40;duration_turns:3","출혈 피해 4% 지속 3턴"
+UE_RUNE_BARRIER,룬 장벽,active_on_hp_threshold,"shield_pct:200;threshold_pct:50","HP 50% 이하에서 보호막 20%"
+UE_VOID_SIGIL,공허 인장,passive,"resistance_pct:500","상태 이상 저항 +5%"
+UE_ABYSSAL_CHAIN,심연의 사슬,active_on_skill,"stun_chance_bp:2000;duration_turns:1","스킬 적중 시 20% 확률로 기절"

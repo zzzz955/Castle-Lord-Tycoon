@@ -1,0 +1,5 @@
+flag_id,flag_name_ko,size_tiles,size_cells,cost_gold,resale_rate_pct,rank_required,max_owned,description_ko
+FLAG_SMALL,작은 깃발,3x3,9,100,2500,RANK_LORD,10,"초기 영토 확보용 소형 깃발"
+FLAG_MEDIUM,중형 깃발,5x5,25,500,2500,RANK_BARON,8,"중반 필드 확장에 적합"
+FLAG_LARGE,대형 깃발,7x7,49,2000,2500,RANK_VISCOUNT,6,"넓은 영토를 빠르게 차지"
+FLAG_GRAND,거대 깃발,9x9,81,10000,2500,RANK_GRAND_DUKE,3,"최대 범위 확장용 프리미엄 깃발"

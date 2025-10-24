@@ -1,0 +1,12 @@
+enemy_id,enemy_name_ko,visual_id,type,attribute,base_level,base_growth,unique_effect_ids,base_exp,drop_table_id,tags
+EN_GOBLIN_SCOUT,고블린 정찰병,vis_goblin_scout,aggressive,earth,5,12,UE_NONE,50,DT_FIELD_GREEN_COMMON,"field"
+EN_WOLF_PACK,늑대 무리,vis_wolf_pack,swift,wind,6,15,UE_WOLF_HOWL,60,DT_FIELD_GREEN_COMMON,"field"
+EN_GOBLIN_CHIEF,고블린 두목,vis_goblin_chief,balanced,earth,7,18,UE_LEADER_SHOUT,80,DT_FIELD_GREEN_ELITE,"field;elite"
+EN_BANDIT_RAIDER,산적 약탈자,vis_bandit_raider,aggressive,fire,15,22,UE_BLEED_HIT,120,DT_CANYON_COMMON,"field"
+EN_STONE_GOLEM,돌 골렘,vis_stone_golem,defensive,earth,16,25,UE_STONE_SKIN,140,DT_CANYON_COMMON,"field"
+EN_BANDIT_CAPTAIN,산적 두목,vis_bandit_captain,aggressive,fire,18,28,UE_LEADER_SHOUT,170,DT_CANYON_ELITE,"field;elite"
+EN_RUNE_SENTINEL,룬 수호자,vis_rune_sentinel,defensive,arcane,20,32,UE_RUNE_BARRIER,220,DT_CANYON_BOSS,"fortress;boss"
+EN_VOID_CULTIST,공허 신도,vis_void_cultist,aggressive,void,25,36,UE_VOID_SIGIL,260,DT_DUSK_COMMON,"field"
+EN_ARCANE_RANGER,비전 궁수,vis_arcane_ranger,swift,arcane,26,38,UE_MULTI_SHOT,280,DT_DUSK_COMMON,"field"
+EN_LIGHTLESS_KNIGHT,빛 없는 기사,vis_lightless_knight,defensive,void,27,40,UE_SHADOW_AURA,320,DT_DUSK_ELITE,"field;elite"
+EN_ABYSSAL_WARDEN,심연의 감시자,vis_abyssal_warden,balanced,void,30,45,UE_ABYSSAL_CHAIN,380,DT_DUSK_BOSS,"fortress;boss"
