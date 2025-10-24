@@ -3,7 +3,7 @@
 ## 기본 정보
 ```yaml
 title: Castle Lord Tycoon
-genre: 중세 판타지 쿼터뷰 RPG + 자동 전투 + 영토 확장
+genre: 중세 판타지 쿼터뷰 RPG + 자동 전투 + 영토 확장 + 오픈 월드
 camera: 2.5D 아이소메트릭
 target_platform: Mobile(Android 우선)
 dev_type: Solo Development
